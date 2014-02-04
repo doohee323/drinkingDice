@@ -2,6 +2,7 @@ package com.tz.quiz.domain;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 /**
  * <pre>
@@ -9,19 +10,39 @@ import java.util.List;
  * </pre>
  * 
  */
-public class Player {
+public class Player extends Thread implements Callable<Status> {
 
-	private String name = null; // player name
+	private int sn = -1; // player sn
+	private boolean bTurn = false; // whether turn to dice or not 
+	private String playerName = null; // player name
 	private String diceVale = null; // dice result
 	private int drinkingTime = 0; // left time to drink
 	private int drunkCnt = 0; // number which this player's already drunk
 	private int curDrunkSeq = -1; // current sequence to drink
 	private int maxDrinkingCnt = 0; // maximum drinking count which this player
 									// can drink
+	private Status status = new Status();
 
 	private List<Drinking> drinkings = new ArrayList<Drinking>(); // drinkings
-																	// info. to
-																	// drink
+	
+	// info. to
+	// drink
+
+	public Player(int sn, String name, int drinkingTime) {
+		this.sn = sn;
+		this.playerName = name;
+		this.drinkingTime = drinkingTime;
+	}
+
+	@Override
+	public Status call() throws Exception {
+		status.setSn(sn);
+		if(bTurn) {
+			dice();
+			status.setDiceVale(diceVale);
+		}
+		return status;
+	}
 
 	/**
 	 * <pre>
@@ -46,22 +67,6 @@ public class Player {
 		}
 	}
 
-	public Player(String name, int drinkingTime) {
-		this.name = name;
-		this.drinkingTime = drinkingTime;
-	}
-
-	/**
-	 * <pre>
-	 * dice operation
-	 * </pre>
-	 */
-	public void dice() {
-		int dice = (int) (Math.random() * 6 + 1);
-		int dice2 = (int) (Math.random() * 6 + 1);
-		this.diceVale = dice + "," + dice2;
-	}
-
 	/**
 	 * <pre>
 	 * add a drinking to drink to the list
@@ -78,45 +83,13 @@ public class Player {
 				curDrunkSeq++;
 
 			this.drinkings.add(new Drinking());
-			Logger.debug(nSecond + " / add drinking:" + name + " ("
+			Logger.debug(nSecond + " / add drinking:" + playerName + " ("
 					+ (this.drinkings.size() - 1) + ")");
 			return true;
 		}
 		return false;
 	}
-
-	/**
-	 * <pre>
-	 * drinking operation
-	 * </pre>
-	 * 
-	 * @param int nSecond second for logging
-	 * @return boolean finished this drinking or not
-	 */
-	public boolean drinking(int nSecond) {
-		// when nothing to drink, return false
-		if (getLeftDrinkingTime() == 0)
-			return false;
-
-		// get the left time to drink this drinking
-		int dringLeftTime = this.drinkings.get(curDrunkSeq).drinking();
-		Logger.debug(nSecond + " / " + this.getName()
-				+ " is drinking up to :" + dringLeftTime
-				+ ". and has next turn " + (this.drinkings.size() - 1));
-
-		// recalculate current drinking sequence (curDrunkSeq)
-		if (dringLeftTime == 0) {
-			Logger.debug(nSecond + " / finished drinking:" + name + " ("
-					+ curDrunkSeq + ")");
-			if ((this.drinkings.size() - 1) > curDrunkSeq) {
-				curDrunkSeq++;
-			}
-			drunkCnt++;
-			return true;
-		}
-		return false;
-	}
-
+	
 	/**
 	 * <pre>
 	 * get the left time to drink this drinking
@@ -129,55 +102,16 @@ public class Player {
 			return 0;
 		return this.drinkings.get(this.drinkings.size() - 1).getSecondToDrink();
 	}
-	
-	/**
-	 * <pre>
-	 * get the left sequence to drink this drinking
-	 * </pre>
-	 * 
-	 * @return left time to drink
-	 */
-	public int getLeftDrinkingCnt() {
-		return drunkCnt - curDrunkSeq;
-	}
 
 	/**
 	 * <pre>
-	 * get dice vale for display
+	 * dice operation
 	 * </pre>
-	 * 
-	 * @return String
 	 */
-	public String getDiceDisplayVale() {
-		String tmp[] = diceVale.split(",");
-		if(tmp[0].equals(tmp[1])) {
-			return "double " + tmp[0] + "'s";
-		}
-		return "a " + Integer.toString(Integer.parseInt(tmp[0]) + Integer.parseInt(tmp[1]));
-	}
-	
-	public int getDrunkCnt() {
-		return drunkCnt;
-	}
-
-	public void setDrunkCnt(int drunkCnt) {
-		this.drunkCnt = drunkCnt;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public int getDrinkingTime() {
-		return drinkingTime;
-	}
-
-	public void setDrinkingTime(int drinkingTime) {
-		this.drinkingTime = drinkingTime;
+	public void dice() {
+		int dice = (int) (Math.random() * 6 + 1);
+		int dice2 = (int) (Math.random() * 6 + 1);
+		this.diceVale = dice + "," + dice2;
 	}
 
 	public String getDiceVale() {
@@ -188,8 +122,28 @@ public class Player {
 		this.diceVale = diceVale;
 	}
 
-	public List<Drinking> getDrinkings() {
-		return drinkings;
+	public int getDrinkingTime() {
+		return drinkingTime;
+	}
+
+	public void setDrinkingTime(int drinkingTime) {
+		this.drinkingTime = drinkingTime;
+	}
+
+	public int getDrunkCnt() {
+		return drunkCnt;
+	}
+
+	public void setDrunkCnt(int drunkCnt) {
+		this.drunkCnt = drunkCnt;
+	}
+
+	public int getCurDrunkSeq() {
+		return curDrunkSeq;
+	}
+
+	public void setCurDrunkSeq(int curDrunkSeq) {
+		this.curDrunkSeq = curDrunkSeq;
 	}
 
 	public int getMaxDrinkingCnt() {
@@ -199,4 +153,45 @@ public class Player {
 	public void setMaxDrinkingCnt(int maxDrinkingCnt) {
 		this.maxDrinkingCnt = maxDrinkingCnt;
 	}
+
+	public String getPlayerName() {
+		return playerName;
+	}
+
+	public void setPlayerName(String playerName) {
+		this.playerName = playerName;
+	}
+
+	public int getSn() {
+		return sn;
+	}
+
+	public void setSn(int sn) {
+		this.sn = sn;
+	}
+
+	public boolean isbTurn() {
+		return bTurn;
+	}
+
+	public void setbTurn(boolean bTurn) {
+		this.bTurn = bTurn;
+	}
+
+	public List<Drinking> getDrinkings() {
+		return drinkings;
+	}
+
+	public void setDrinkings(List<Drinking> drinkings) {
+		this.drinkings = drinkings;
+	}
+
+	public Status getStatus() {
+		return status;
+	}
+
+	public void setStatus(Status status) {
+		this.status = status;
+	}
+
 }

@@ -2,12 +2,19 @@ package com.tz.quiz.service;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
-import com.tz.quiz.domain.Logger;
 import com.tz.quiz.domain.Player;
 import com.tz.quiz.domain.Roll;
+import com.tz.quiz.domain.Status;
 import com.tz.quiz.support.Constants;
 
 /**
@@ -18,22 +25,8 @@ import com.tz.quiz.support.Constants;
  */
 public class DrinkingService {
 
-	class SimpleThread extends Thread {
-		public SimpleThread(String str) {
-			super(str);
-		}
-
-		public void run() {
-			for (int i = 0; i < 10; i++) {
-				System.out.println(i + " " + getName());
-				try {
-					sleep((int) (Math.random() * 1000));
-				} catch (InterruptedException e) {
-				}
-			}
-			System.out.println("DONE! " + getName());
-		}
-	}
+	private static volatile boolean gameOn = true;
+	private Status status = new Status();
 
 	/**
 	 * <pre>
@@ -45,8 +38,10 @@ public class DrinkingService {
 	 * @param List
 	 *            <Player> players participants of game
 	 * @return roll output roll itself
+	 * @throws InterruptedException
 	 */
-	public Roll playDrinkingGame(Roll roll, List<Player> players) {
+	public Roll playDrinkingGame(Roll roll, List<Player> players)
+			throws InterruptedException {
 
 		// play with random roll or not
 		if (Constants.radomPlay) {
@@ -54,104 +49,73 @@ public class DrinkingService {
 		}
 		roll.setPlayers(players);
 
-		int nSecond = 0; // time by second
-		int nSeq = 0; // for rolling time (speed of game)
+		int nSize = roll.getPlayers().size();
 		boolean bDrinking = false; // whether exist currently drinking person
-		boolean bWin = false; // case of getting winning value
-		while (roll.getPlayers().size() > 1) {
 
-			// calculate for drinker's drinking time
-			for (int i = 0; i < roll.getPlayers().size(); i++) {
+		while (gameOn) {
+			int nSecond = 0; // time by second
+
+			Thread.sleep(1000);
+
+			ExecutorService pool = Executors.newFixedThreadPool(nSize);
+			Set<Future<Status>> set = new HashSet<Future<Status>>();
+
+			int nTurn = roll.getnTurn();
+			for (int i = 0; i < nSize; i++) {
 				Player player = roll.getPlayers().get(i);
-				if (player.getDrinkings().size() > 0) {
-					if (player.drinking(nSecond)) { // true => finished
-						roll.redueLeftDrintCnt();
-						// once finished drinking, can join rolling again
-						roll = findNextDicer(roll);
-
-						roll.setFinishedDrinker(player.getName());
-					}
-					if (player.getDrunkCnt() == roll.getMaxDrinkingCnt()
-							&& player.getLeftDrinkingTime() == 0) {
-						Logger.debug(nSecond + " / droped off :"
-								+ player.getName());
-						roll.removePlayer(player.getName());
-						roll = findNextDicer(roll);
-
-						roll.setDropedDrinker(player.getName());
-					}
+				if (nTurn == player.getSn()) {
+					player.setbTurn(true);
+				} else {
+					player.setbTurn(false);
 				}
+				player.setStatus(status);
+				Callable<Status> callable = player;
+				Future<Status> future = pool.submit(callable);
+				set.add(future);
 			}
 
-			// if only one player is left, game finish
-			if (roll.getPlayers().size() < 2) {
-				break;
-			}
+			for (Future<Status> future : set) {
+				try {
+					// check exist drinking player
+					bDrinking = roll.getLeftDrintCnt() > 0 ? true : false;
+					
+					Status curStatus = future.get();
+					String diceVale = curStatus.getDiceVale();
+					int nSn = curStatus.getSn();
+					System.out.println(nSn + ":" + diceVale);
 
-			// dicing considering with game speed
-			if (nSecond == 0 || nSecond >= (roll.getPausetime() * nSeq)) {
-				Player curPlayer = roll.getCurPlayer();
-				curPlayer.dice();
-
-				// check exist drinking player
-				bDrinking = roll.getLeftDrintCnt() > 0 ? true : false;
-
-				Logger.debug(nSecond + " / dice:" + curPlayer.getName() + " ("
-						+ roll.getnTurn() + ") / bDrinking:" + bDrinking + " ("
-						+ curPlayer.getDiceVale() + ")");
-				bWin = Constants.isWin(curPlayer.getDiceVale());
-				if (bWin) {
-					// choose driker at ramdon
-					List<Player> drinkers = getDrinkers(roll,
-							curPlayer.getName());
-					if (drinkers.size() > 0) {
-						String selectedPlayer = drinkers.get(0).getName();
-						for (int i = 0; i < roll.getPlayers().size(); i++) {
-							// assign a drinking to drinker
-							Player player = roll.getPlayers().get(i);
-							if (selectedPlayer.equals(player.getName())) {
-								roll.getPlayers().get(i).addDrinking(nSecond);
-								roll.addLeftDrintCnt();
-								roll.setAddedDrinker(roll.getPlayers().get(i)
-										.getName());
-								break;
-							}
+					boolean bWin = Constants.isWin(diceVale);
+					if (bWin) {
+						// choose driker at ramdon
+						int indx = getDrinkers(roll, nSn);
+						if (indx >= 0) {
+							roll.getPlayers().get(indx).addDrinking(nSecond);
+							roll.addLeftDrintCnt();
+							roll.setAddedDrinker(roll.getPlayers().get(indx)
+									.getName());
 						}
+
 					}
-				}
-				nSeq++;
 
-				// print status
-				roll.logStatus(bWin);
-
-				// when existing drinking plaer, current winner can roll again.
-				if (!bDrinking) {
-					// if else, find the next player who is'nt drinking
-					roll = findNextDicer(roll);
+					if (!bDrinking) {
+						// if else, find the next player who is'nt drinking
+						roll = findNextDicer(roll);
+					}
+					
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ExecutionException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 			}
-
 			nSecond++;
 		}
-
-		roll.logEnd();
-
-		// return roll
 		return roll;
 	}
 
-	/**
-	 * <pre>
-	 * get available drinkers
-	 * </pre>
-	 * 
-	 * @param Roll
-	 *            roll <Player> current roll
-	 * @param String
-	 *            self except for self
-	 * @return List<Player> available drinkers
-	 */
-	public List<Player> getDrinkers(Roll roll, String self) {
+	public int getDrinkers(Roll roll, int self) {
 		int maxDrintCnt = roll.getMaxDrinkingCnt();
 
 		// choose driker at ramdon
@@ -159,7 +123,7 @@ public class DrinkingService {
 		Iterator<Player> e = roll.getPlayers().iterator();
 		while (e.hasNext()) {
 			Player player = e.next();
-			if (!player.getName().equals(self)
+			if (player.getSn() != self
 					&& player.getDrinkings().size() < maxDrintCnt) {
 				players.add(player);
 			}
@@ -169,9 +133,11 @@ public class DrinkingService {
 		if (Constants.radomPlay) {
 			Collections.shuffle(players);
 		}
-		return players;
+		if (players.size() == 0)
+			return -1;
+		return players.get(0).getSn();
 	}
-
+	
 	/**
 	 * <pre>
 	 * find the next player who is'nt drinking
@@ -204,5 +170,4 @@ public class DrinkingService {
 		roll.setnTurn(nTurn);
 		return roll;
 	}
-
 }

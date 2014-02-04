@@ -59,7 +59,7 @@ public class Constants {
 		Iterator<Player> e = input.iterator();
 		while (e.hasNext()) {
 			Player player = e.next();
-			if (!player.getName().equals(except)) {
+			if (!player.getPlayerName().equals(except)) {
 				players.add(player);
 			}
 		}

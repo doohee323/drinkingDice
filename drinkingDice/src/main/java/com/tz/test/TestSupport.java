@@ -185,7 +185,7 @@ public abstract class TestSupport implements Test {
     private String getRollMethodName() {
 
         Method method = getRollMethod();
-        return method == null ? null : method.getName();
+        return method == null ? null : method.getPlayerName();
     }
 
     private Method getRollMethod() {
