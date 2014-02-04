@@ -23,6 +23,8 @@ import com.tz.quiz.support.Constants;
 public class DrinkingService {
 
 	private Status status = new Status();
+	private int pausetime = Constants.defaultRollSpeed; // rolling time
+	private int maxDrinkingCnt = Constants.defaultMaxDrinkingCnt; // maximum
 
 	/**
 	 * <pre>
@@ -36,62 +38,96 @@ public class DrinkingService {
 	 * @return roll output roll itself
 	 * @throws InterruptedException
 	 */
-	public Status playDrinkingGame(List<Player> players)
-			throws InterruptedException {
+	public Status playDrinkingGame(List<Player> players) {
 
-		// play with random roll or not
-		if (Constants.radomPlay) {
-			Collections.shuffle(players);
-		}
-		status.setPlayers(players);
-
-		int nSecond = 0; // time by second
-		while (true) {
-
-			// if only one player is left, game finish
-			if (status.getPlayers().size() < 2) {
-				break;
+		try {
+			// play with random roll or not
+			if (Constants.radomPlay) {
+				Collections.shuffle(players);
 			}
+			status.setPlayers(players);
 
-			status.setnSecond(nSecond);
+			int nSecond = 0; // time by second
+			while (true) {
 
-			Thread.sleep(100);
-
-			ExecutorService pool = Executors.newFixedThreadPool(status
-					.getPlayers().size());
-			Set<Future<Status>> set = new HashSet<Future<Status>>();
-
-			int nTurn = status.getnTurn();
-			for (int i = 0; i < status.getPlayers().size(); i++) {
-				Player player = status.getPlayers().get(i);
-				if (nTurn == player.getSn()) {
-					player.setbTurn(true);
-				} else {
-					player.setbTurn(false);
+				// if only one player is left, game finish
+				if (status.getPlayers().size() < 2) {
+					break;
 				}
-				player.setStatus(status);
-				Callable<Status> callable = player;
-				Future<Status> future = pool.submit(callable);
-				set.add(future);
+
+				status.setnSecond(nSecond);
+
+				Thread.sleep(100);
+
+				ExecutorService pool = Executors.newFixedThreadPool(status
+						.getPlayers().size());
+				Set<Future<Status>> set = new HashSet<Future<Status>>();
+
+				int nTurn = status.getnTurn();
+				for (int i = 0; i < status.getPlayers().size(); i++) {
+					Player player = status.getPlayers().get(i);
+					if (nTurn == player.getSn()) {
+						player.setbTurn(true);
+					} else {
+						player.setbTurn(false);
+					}
+					player.setStatus(status);
+					Callable<Status> callable = player;
+					Future<Status> future = pool.submit(callable);
+					set.add(future);
+				}
+
+				boolean bWin = false;
+				for (Future<Status> future : set) {
+					try {
+						status = future.get();
+						if (status.isbWin())
+							bWin = true;
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (ExecutionException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				status.setbWin(bWin);
+
+				// print status
+				status.logStatus();
+
+				pool.shutdown();
+				nSecond++;
 			}
 
-			for (Future<Status> future : set) {
-				try {
-					status = future.get();
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (ExecutionException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-			pool.shutdown();
-			nSecond++;
+			// print status
+			status.logEnd();
+
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
 		}
-		
-		
+
 		return status;
+	}
+
+	public int getPausetime() {
+		return pausetime;
+	}
+
+	public void setPausetime(int pausetime) {
+		this.pausetime = pausetime;
+	}
+
+	public int getMaxDrinkingCnt() {
+		return maxDrinkingCnt;
+	}
+
+	public void setMaxDrinkingCnt(int maxDrinkingCnt) {
+		this.maxDrinkingCnt = maxDrinkingCnt;
 	}
 
 }

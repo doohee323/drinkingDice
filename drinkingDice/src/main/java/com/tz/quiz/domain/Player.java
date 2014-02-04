@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 import com.tz.quiz.support.Constants;
+import com.tz.quiz.support.Logger;
 
 /**
  * <pre>
@@ -38,11 +39,12 @@ public class Player extends Thread implements Callable<Status> {
 		synchronized (status) {
 
 			int nSecond = status.getnSecond();
-			System.out.println(nSecond + " : I'm " + playerName);
+			Logger.debug(nSecond + " : I'm " + playerName);
 			if (bTurn) {
 				dice();
 				boolean bWin = Constants.isWin(diceVale);
 				if (bWin) {
+					status.setbWin(true);
 					// choose driker at ramdon
 					int indx = getDrinkers(status, sn);
 					if (indx >= 0) {
@@ -208,6 +210,32 @@ public class Player extends Thread implements Callable<Status> {
 		this.diceVale = dice + "," + dice2;
 	}
 
+	/**
+	 * <pre>
+	 * get dice vale for display
+	 * </pre>
+	 * 
+	 * @return String
+	 */
+	public String getDiceDisplayVale() {
+		String tmp[] = diceVale.split(",");
+		if(tmp[0].equals(tmp[1])) {
+			return "double " + tmp[0] + "'s";
+		}
+		return "a " + Integer.toString(Integer.parseInt(tmp[0]) + Integer.parseInt(tmp[1]));
+	}
+	
+	/**
+	 * <pre>
+	 * get the left sequence to drink this drinking
+	 * </pre>
+	 * 
+	 * @return left time to drink
+	 */
+	public int getLeftDrinkingCnt() {
+		return drunkCnt - curDrunkSeq;
+	}
+	
 	public String getDiceVale() {
 		return diceVale;
 	}
