@@ -22,7 +22,6 @@ import com.tz.quiz.support.Constants;
  */
 public class DrinkingService {
 
-	private static volatile boolean gameOn = true;
 	private Status status = new Status();
 
 	/**
@@ -46,20 +45,24 @@ public class DrinkingService {
 		}
 		status.setPlayers(players);
 
-		int nSize = status.getPlayers().size();
-		boolean bDrinking = false; // whether exist currently drinking person
-
 		int nSecond = 0; // time by second
-		while (gameOn) {
+		while (true) {
+
+			// if only one player is left, game finish
+			if (status.getPlayers().size() < 2) {
+				break;
+			}
+
 			status.setnSecond(nSecond);
 
-			Thread.sleep(1000);
+			Thread.sleep(100);
 
-			ExecutorService pool = Executors.newFixedThreadPool(nSize);
+			ExecutorService pool = Executors.newFixedThreadPool(status
+					.getPlayers().size());
 			Set<Future<Status>> set = new HashSet<Future<Status>>();
 
 			int nTurn = status.getnTurn();
-			for (int i = 0; i < nSize; i++) {
+			for (int i = 0; i < status.getPlayers().size(); i++) {
 				Player player = status.getPlayers().get(i);
 				if (nTurn == player.getSn()) {
 					player.setbTurn(true);
@@ -75,12 +78,6 @@ public class DrinkingService {
 			for (Future<Status> future : set) {
 				try {
 					status = future.get();
-					// check exist drinking player
-					bDrinking = status.getLeftDrintCnt() > 0 ? true : false;
-					if (!bDrinking) {
-						// if else, find the next player who is'nt drinking
-						status = Constants.findNextDicer(status);
-					}
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -89,9 +86,12 @@ public class DrinkingService {
 					e.printStackTrace();
 				}
 			}
+			pool.shutdown();
 			nSecond++;
 		}
+		
+		
 		return status;
 	}
-	
+
 }

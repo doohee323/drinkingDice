@@ -57,7 +57,7 @@ public class Player extends Thread implements Callable<Status> {
 				if (drinkings.size() > 0) {
 					if (drinking()) { // true => finished
 						status.redueLeftDrintCnt();
-						// once finished drinking, can join statusing again
+						// once finished drinking, can join rolling again
 						status = Constants.findNextDicer(status);
 
 						status.setFinishedDrinker(playerName);
@@ -73,6 +73,12 @@ public class Player extends Thread implements Callable<Status> {
 				}
 			}
 
+			// check exist drinking player
+			boolean bDrinking = status.getLeftDrintCnt() > 0 ? true : false;
+			if (!bDrinking) {
+				// if else, find the next player who is'nt drinking
+				status = Constants.findNextDicer(status);
+			}
 		}
 
 		return status;
