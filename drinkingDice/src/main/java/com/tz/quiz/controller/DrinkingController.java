@@ -11,8 +11,8 @@ import com.tz.quiz.support.Constants;
 public class DrinkingController {
 	public static void main(String[] args) {
 
-		Constants.radomPlay = true;
-		Constants.debug = false;
+		Constants.radomPlay = false;
+		Constants.debug = true;
 
 		// 2) define players
 		List<Player> players = new ArrayList<Player>();

@@ -52,8 +52,8 @@ public class DrinkingService {
 		int nSize = status.getPlayers().size();
 		boolean bDrinking = false; // whether exist currently drinking person
 
+		int nSecond = 0; // time by second
 		while (gameOn) {
-			int nSecond = 0; // time by second
 			status.setnSecond(nSecond);
 
 			Thread.sleep(1000);

@@ -26,7 +26,6 @@ public class Player extends Thread implements Callable<Status> {
 	private Status status = new Status();
 
 	private List<Drinking> drinkings = new ArrayList<Drinking>(); // drinkings
-
 	// info. to
 	// drink
 
@@ -38,45 +37,49 @@ public class Player extends Thread implements Callable<Status> {
 
 	@Override
 	public Status call() throws Exception {
-		status.setSn(sn);
-		int nSecond = status.getnSecond();
-		if (bTurn) {
-			dice();
-			status.setDiceVale(diceVale);
+		synchronized (status) {
 
-			System.out.println(sn + ":" + diceVale);
+			int nSecond = status.getnSecond();
+			System.out.println(nSecond + " : I'm " + playerName);
+			status.setSn(sn);
+			if (bTurn) {
+				dice();
+				status.setDiceVale(diceVale);
 
-			boolean bWin = Constants.isWin(diceVale);
-			if (bWin) {
-				// choose driker at ramdon
-				int indx = getDrinkers(status, sn);
-				if (indx >= 0) {
-					status.getPlayers().get(indx).addDrinking();
-					status.addLeftDrintCnt();
-					status.setAddedDrinker(status.getPlayers().get(indx)
-							.getName());
+				boolean bWin = Constants.isWin(diceVale);
+				if (bWin) {
+					// choose driker at ramdon
+					int indx = getDrinkers(status, sn);
+					if (indx >= 0) {
+						status.getPlayers().get(indx).addDrinking();
+						status.addLeftDrintCnt();
+						status.setAddedDrinker(status.getPlayers().get(indx)
+								.getPlayerName());
+					}
+				}
+			} else {
+				// calculate for drinker's drinking time
+				if (drinkings.size() > 0) {
+					if (drinking()) { // true => finished
+						status.redueLeftDrintCnt();
+						// once finished drinking, can join statusing again
+						status = Constants.findNextDicer(status);
+
+						status.setFinishedDrinker(playerName);
+					}
+					if (drunkCnt == status.getMaxDrinkingCnt()
+							&& getLeftDrinkingTime() == 0) {
+						Logger.debug(nSecond + " / droped off :" + playerName);
+						status.removePlayer(playerName);
+						status = Constants.findNextDicer(status);
+
+						status.setDropedDrinker(playerName);
+					}
 				}
 			}
-		} else {
-			// calculate for drinker's drinking time
-			if (drinkings.size() > 0) {
-				if (drinking()) { // true => finished
-					status.redueLeftDrintCnt();
-					// once finished drinking, can join statusing again
-					status = Constants.findNextDicer(status);
 
-					status.setFinishedDrinker(playerName);
-				}
-				if (drunkCnt == status.getMaxDrinkingCnt()
-						&& getLeftDrinkingTime() == 0) {
-					Logger.debug(nSecond + " / droped off :" + playerName);
-					status.removePlayer(playerName);
-					status = Constants.findNextDicer(status);
-
-					status.setDropedDrinker(playerName);
-				}
-			}
 		}
+
 		return status;
 	}
 
@@ -118,7 +121,7 @@ public class Player extends Thread implements Callable<Status> {
 
 		// get the left time to drink this drinking
 		int dringLeftTime = this.drinkings.get(curDrunkSeq).drinking();
-		Logger.debug(status.getnSecond() + " / " + this.getName()
+		Logger.debug(status.getnSecond() + " / " + this.playerName
 				+ " is drinking up to :" + dringLeftTime
 				+ ". and has next turn " + (this.drinkings.size() - 1));
 
