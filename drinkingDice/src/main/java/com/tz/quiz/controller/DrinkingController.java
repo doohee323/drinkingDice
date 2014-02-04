@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.tz.quiz.domain.Player;
-import com.tz.quiz.domain.Roll;
 import com.tz.quiz.service.DrinkingService;
 import com.tz.quiz.support.Constants;
 

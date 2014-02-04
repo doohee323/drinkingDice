@@ -1,9 +1,7 @@
 package com.tz.quiz.service;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -13,7 +11,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import com.tz.quiz.domain.Player;
-import com.tz.quiz.domain.Roll;
 import com.tz.quiz.domain.Status;
 import com.tz.quiz.support.Constants;
 
@@ -78,17 +75,12 @@ public class DrinkingService {
 			for (Future<Status> future : set) {
 				try {
 					status = future.get();
-
 					// check exist drinking player
 					bDrinking = status.getLeftDrintCnt() > 0 ? true : false;
-					
 					if (!bDrinking) {
 						// if else, find the next player who is'nt drinking
 						status = Constants.findNextDicer(status);
 					}
-					
-					// 
-					
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

@@ -13,25 +13,14 @@ import com.tz.quiz.support.Constants;
  */
 public class Status {
 
-	private int sn = 0; // current turn of player
-
-	private String diceVale = "";
-
-	private int nSecond = 0;
-
+	private int nTurn = 0;	// current turn's player's index
+	private int nSecond = 0;	// time (seconds)
 	private int maxDrinkingCnt = Constants.defaultMaxDrinkingCnt; // maximum
+	private int leftDrintCnt = 0; // number of drinking player at this moment
+	private List<Player> players = new ArrayList<Player>();
 	private String addedDrinker = null; // added drinker name at last
 	private String finishedDrinker = null; // finished drinker name at last
 	private String dropedDrinker = null; // droped drinker name at last
-	
-	// which player can
-	// drink in this
-	// rolling
-	private int leftDrintCnt = 0; // number of drinking player at this moment
-	private List<Player> players = new ArrayList<Player>();
-
-	private int nTurn = 0;
-	private int nAssing = -1;
 
 	public int getnTurn() {
 		return nTurn;
@@ -39,14 +28,6 @@ public class Status {
 
 	public void setnTurn(int nTurn) {
 		this.nTurn = nTurn;
-	}
-
-	public int getnAssing() {
-		return nAssing;
-	}
-
-	public void setnAssing(int nAssing) {
-		this.nAssing = nAssing;
 	}
 
 	public Player getCurPlayer() {
@@ -100,22 +81,6 @@ public class Status {
 
 	public void setnSecond(int nSecond) {
 		this.nSecond = nSecond;
-	}
-
-	public String getDiceVale() {
-		return diceVale;
-	}
-
-	public void setDiceVale(String diceVale) {
-		this.diceVale = diceVale;
-	}
-
-	public int getSn() {
-		return sn;
-	}
-
-	public void setSn(int sn) {
-		this.sn = sn;
 	}
 
 	public String getFinishedDrinker() {

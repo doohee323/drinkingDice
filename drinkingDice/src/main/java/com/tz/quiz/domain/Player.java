@@ -26,8 +26,6 @@ public class Player extends Thread implements Callable<Status> {
 	private Status status = new Status();
 
 	private List<Drinking> drinkings = new ArrayList<Drinking>(); // drinkings
-	// info. to
-	// drink
 
 	public Player(int sn, String name, int drinkingTime) {
 		this.sn = sn;
@@ -41,11 +39,8 @@ public class Player extends Thread implements Callable<Status> {
 
 			int nSecond = status.getnSecond();
 			System.out.println(nSecond + " : I'm " + playerName);
-			status.setSn(sn);
 			if (bTurn) {
 				dice();
-				status.setDiceVale(diceVale);
-
 				boolean bWin = Constants.isWin(diceVale);
 				if (bWin) {
 					// choose driker at ramdon
