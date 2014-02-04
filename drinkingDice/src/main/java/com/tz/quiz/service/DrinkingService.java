@@ -40,29 +40,30 @@ public class DrinkingService {
 	 * @return roll output roll itself
 	 * @throws InterruptedException
 	 */
-	public Roll playDrinkingGame(Roll roll, List<Player> players)
+	public Status playDrinkingGame(List<Player> players)
 			throws InterruptedException {
 
 		// play with random roll or not
 		if (Constants.radomPlay) {
 			Collections.shuffle(players);
 		}
-		roll.setPlayers(players);
+		status.setPlayers(players);
 
-		int nSize = roll.getPlayers().size();
+		int nSize = status.getPlayers().size();
 		boolean bDrinking = false; // whether exist currently drinking person
 
 		while (gameOn) {
 			int nSecond = 0; // time by second
+			status.setnSecond(nSecond);
 
 			Thread.sleep(1000);
 
 			ExecutorService pool = Executors.newFixedThreadPool(nSize);
 			Set<Future<Status>> set = new HashSet<Future<Status>>();
 
-			int nTurn = roll.getnTurn();
+			int nTurn = status.getnTurn();
 			for (int i = 0; i < nSize; i++) {
-				Player player = roll.getPlayers().get(i);
+				Player player = status.getPlayers().get(i);
 				if (nTurn == player.getSn()) {
 					player.setbTurn(true);
 				} else {
@@ -76,31 +77,17 @@ public class DrinkingService {
 
 			for (Future<Status> future : set) {
 				try {
+					status = future.get();
+
 					// check exist drinking player
-					bDrinking = roll.getLeftDrintCnt() > 0 ? true : false;
+					bDrinking = status.getLeftDrintCnt() > 0 ? true : false;
 					
-					Status curStatus = future.get();
-					String diceVale = curStatus.getDiceVale();
-					int nSn = curStatus.getSn();
-					System.out.println(nSn + ":" + diceVale);
-
-					boolean bWin = Constants.isWin(diceVale);
-					if (bWin) {
-						// choose driker at ramdon
-						int indx = getDrinkers(roll, nSn);
-						if (indx >= 0) {
-							roll.getPlayers().get(indx).addDrinking(nSecond);
-							roll.addLeftDrintCnt();
-							roll.setAddedDrinker(roll.getPlayers().get(indx)
-									.getName());
-						}
-
-					}
-
 					if (!bDrinking) {
 						// if else, find the next player who is'nt drinking
-						roll = findNextDicer(roll);
+						status = Constants.findNextDicer(status);
 					}
+					
+					// 
 					
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
@@ -112,62 +99,7 @@ public class DrinkingService {
 			}
 			nSecond++;
 		}
-		return roll;
-	}
-
-	public int getDrinkers(Roll roll, int self) {
-		int maxDrintCnt = roll.getMaxDrinkingCnt();
-
-		// choose driker at ramdon
-		List<Player> players = new ArrayList<Player>();
-		Iterator<Player> e = roll.getPlayers().iterator();
-		while (e.hasNext()) {
-			Player player = e.next();
-			if (player.getSn() != self
-					&& player.getDrinkings().size() < maxDrintCnt) {
-				players.add(player);
-			}
-		}
-
-		// play with random roll or not
-		if (Constants.radomPlay) {
-			Collections.shuffle(players);
-		}
-		if (players.size() == 0)
-			return -1;
-		return players.get(0).getSn();
+		return status;
 	}
 	
-	/**
-	 * <pre>
-	 * find the next player who is'nt drinking
-	 * </pre>
-	 * 
-	 * @param Roll
-	 *            roll <Player> current roll
-	 * @return Roll roll <Player> current roll
-	 */
-	public Roll findNextDicer(Roll roll) {
-		int nTurn = roll.getnTurn();
-		// if there is no one drinking, turn change.
-		if (roll.getLeftDrintCnt() == 0) {
-			nTurn++;
-		}
-
-		// if the next player is drinking, then the turn pass to the next one.
-		// nTurn++;
-		// for (int i = nTurn; i < roll.getPlayers().size(); i++) {
-		// if(roll.getPlayers().get(i).getLeftDrinkingTime() == 0) {
-		// break;
-		// } else {
-		// nTurn++;
-		// }
-		// }
-
-		if (nTurn >= roll.getPlayers().size()) {
-			nTurn = 0;
-		}
-		roll.setnTurn(nTurn);
-		return roll;
-	}
 }

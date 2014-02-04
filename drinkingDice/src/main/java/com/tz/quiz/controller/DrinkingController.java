@@ -11,7 +11,6 @@ import com.tz.quiz.support.Constants;
 public class DrinkingController {
 	public static void main(String[] args) {
 
-		Roll roll = new Roll();
 		Constants.radomPlay = true;
 		Constants.debug = false;
 
@@ -23,13 +22,13 @@ public class DrinkingController {
 		Player player2 = new Player(1, "Bob", 3);
 		players.add(player2);
 
-		Player player3 = new Player(2, "Chris", 5);
-		players.add(player3);
+//		Player player3 = new Player(2, "Chris", 5);
+//		players.add(player3);
 
 		// 3) run the game
 		DrinkingService game = new DrinkingService();
 		try {
-			game.playDrinkingGame(roll, players);
+			game.playDrinkingGame(players);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

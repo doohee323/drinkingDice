@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.tz.quiz.domain.Player;
+import com.tz.quiz.domain.Status;
 
 /**
  * <pre>
@@ -66,4 +67,37 @@ public class Constants {
 		return players;
 	}
 	
+
+	/**
+	 * <pre>
+	 * find the next player who is'nt drinking
+	 * </pre>
+	 * 
+	 * @param Roll
+	 *            roll <Player> current roll
+	 * @return Roll roll <Player> current roll
+	 */
+	public static Status findNextDicer(Status status) {
+		int nTurn = status.getnTurn();
+		// if there is no one drinking, turn change.
+		if (status.getLeftDrintCnt() == 0) {
+			nTurn++;
+		}
+
+		// if the next player is drinking, then the turn pass to the next one.
+		// nTurn++;
+		// for (int i = nTurn; i < roll.getPlayers().size(); i++) {
+		// if(roll.getPlayers().get(i).getLeftDrinkingTime() == 0) {
+		// break;
+		// } else {
+		// nTurn++;
+		// }
+		// }
+
+		if (nTurn >= status.getPlayers().size()) {
+			nTurn = 0;
+		}
+		status.setnTurn(nTurn);
+		return status;
+	}
 }
