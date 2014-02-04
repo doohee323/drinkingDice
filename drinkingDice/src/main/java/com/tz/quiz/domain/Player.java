@@ -36,51 +36,58 @@ public class Player extends Thread implements Callable<Status> {
 
 	@Override
 	public Status call() throws Exception {
-		synchronized (status) {
 
-			int nSecond = status.getnSecond();
-			Logger.debug(nSecond + " : I'm " + playerName);
-			if (bTurn) {
-				dice();
-				boolean bWin = Constants.isWin(diceVale);
-				if (bWin) {
-					status.setbWin(true);
-					// choose driker at ramdon
-					int indx = getDrinkers(status, sn);
-					if (indx >= 0) {
-						status.getPlayers().get(indx).addDrinking();
-						status.addLeftDrintCnt();
-						status.setAddedDrinker(status.getPlayers().get(indx)
-								.getPlayerName());
+		try {
+			synchronized (status) {
+
+				int nSecond = status.getnSecond();
+				Logger.debug(nSecond + " : I'm " + playerName);
+				if (bTurn) {
+					dice();
+					boolean bWin = Constants.isWin(diceVale);
+					if (bWin) {
+						status.setbWin(true);
+						// choose driker at ramdon
+						int indx = getDrinkers(status, sn);
+						if (indx >= 0) {
+							status.getPlayerBySn(indx).addDrinking();
+							status.addLeftDrintCnt();
+							status.setAddedDrinker(status.getPlayerBySn(indx)
+									.getPlayerName());
+						}
+					}
+				} else {
+					// calculate for drinker's drinking time
+					if (drinkings.size() > 0) {
+						if (drinking()) { // true => finished
+							status.redueLeftDrintCnt();
+							// once finished drinking, can join rolling again
+							status = Constants.findNextDicer(status);
+
+							status.setFinishedDrinker(playerName);
+						}
+						if (drunkCnt == status.getMaxDrinkingCnt()
+								&& getLeftDrinkingTime() == 0) {
+							Logger.debug(nSecond + " / droped off :"
+									+ playerName);
+							status.removePlayer(playerName);
+							status = Constants.findNextDicer(status);
+
+							status.setDropedDrinker(playerName);
+						}
 					}
 				}
-			} else {
-				// calculate for drinker's drinking time
-				if (drinkings.size() > 0) {
-					if (drinking()) { // true => finished
-						status.redueLeftDrintCnt();
-						// once finished drinking, can join rolling again
-						status = Constants.findNextDicer(status);
 
-						status.setFinishedDrinker(playerName);
-					}
-					if (drunkCnt == status.getMaxDrinkingCnt()
-							&& getLeftDrinkingTime() == 0) {
-						Logger.debug(nSecond + " / droped off :" + playerName);
-						status.removePlayer(playerName);
-						status = Constants.findNextDicer(status);
-
-						status.setDropedDrinker(playerName);
-					}
+				// check exist drinking player
+				boolean bDrinking = status.getLeftDrintCnt() > 0 ? true : false;
+				if (!bDrinking) {
+					// if else, find the next player who is'nt drinking
+					status = Constants.findNextDicer(status);
 				}
 			}
-
-			// check exist drinking player
-			boolean bDrinking = status.getLeftDrintCnt() > 0 ? true : false;
-			if (!bDrinking) {
-				// if else, find the next player who is'nt drinking
-				status = Constants.findNextDicer(status);
-			}
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
 		}
 
 		return status;
@@ -219,12 +226,14 @@ public class Player extends Thread implements Callable<Status> {
 	 */
 	public String getDiceDisplayVale() {
 		String tmp[] = diceVale.split(",");
-		if(tmp[0].equals(tmp[1])) {
+		if (tmp[0].equals(tmp[1])) {
 			return "double " + tmp[0] + "'s";
 		}
-		return "a " + Integer.toString(Integer.parseInt(tmp[0]) + Integer.parseInt(tmp[1]));
+		return "a "
+				+ Integer.toString(Integer.parseInt(tmp[0])
+						+ Integer.parseInt(tmp[1]));
 	}
-	
+
 	/**
 	 * <pre>
 	 * get the left sequence to drink this drinking
@@ -235,7 +244,7 @@ public class Player extends Thread implements Callable<Status> {
 	public int getLeftDrinkingCnt() {
 		return drunkCnt - curDrunkSeq;
 	}
-	
+
 	public String getDiceVale() {
 		return diceVale;
 	}

@@ -37,7 +37,7 @@ public class PlayerTest extends TestSupport {
 		List<Player> players = new ArrayList<Player>();
 
 		Constants.radomPlay = false;
-		Constants.debug = true;
+		Constants.debug = false;
 
 		given("with @ players,", "3");
 		{

@@ -1,6 +1,7 @@
 package com.tz.quiz.domain;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import com.tz.quiz.support.Constants;
@@ -59,8 +60,8 @@ public class Status {
 		logger.println(curPlayer.getPlayerName() + " rolled "
 				+ curPlayer.getDiceDisplayVale());
 		if (addedDrinker != null) {
-			logger.println(curPlayer.getPlayerName() + " says: '" + addedDrinker
-					+ ", drink!'");
+			logger.println(curPlayer.getPlayerName() + " says: '"
+					+ addedDrinker + ", drink!'");
 		}
 		if (finishedDrinker != null) {
 			logger.println(finishedDrinker + " is done drinking.");
@@ -112,6 +113,17 @@ public class Status {
 
 	public Player getCurPlayer() {
 		return getPlayers().get(nTurn);
+	}
+
+	public Player getPlayerBySn(int sn) {
+		Iterator<Player> e = players.iterator();
+		while (e.hasNext()) {
+			Player player = e.next();
+			if (player.getSn() == sn) {
+				return player;
+			}
+		}
+		return null;
 	}
 
 	public List<Player> getPlayers() {
