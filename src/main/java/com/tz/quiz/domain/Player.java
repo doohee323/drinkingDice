@@ -26,7 +26,7 @@ public class Player extends Thread implements Callable<Status> {
 	private int curDrunkSeq = -1; // current sequence to drink
 	private Status status = null;
 
-	private List<Drinking> drinkings = null; // drinkings
+	private List<Drinking> drinkings = new ArrayList<Drinking>(); // drinkings
 
 	/**
 	 * <pre>
