@@ -73,7 +73,7 @@ public class Status {
 					+ " says: 'I've had too many. I need to stop.'");
 		}
 		logger.println("\n");
-		logger.flush();
+		//logger.flush();
 		addedDrinker = null;
 		finishedDrinker = null;
 		dropedDrinker = null;
@@ -99,7 +99,7 @@ public class Status {
 				+ "is the winner.");
 		logger.println("\n");
 		logger.println(curPlayer.getPlayerName() + "is the winner!");
-		logger.flush();
+		//logger.flush();
 		addedDrinker = null;
 		finishedDrinker = null;
 		dropedDrinker = null;

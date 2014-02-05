@@ -40,7 +40,7 @@ public class Player extends Thread implements Callable<Status> {
 			synchronized (status) {
 				int pauseTime = status.getPausetime();
 				int nSecond = status.getnSecond();
-				Logger.debug(nSecond + " : I'm " + playerName);
+				//Logger.debug(nSecond + " : I'm " + playerName);
 				if (bTurn) {
 					if (nSecond == 0 || (nSecond % pauseTime) == 0) {
 						dice();
@@ -85,6 +85,7 @@ public class Player extends Thread implements Callable<Status> {
 					// if else, find the next player who is'nt drinking
 					status = Constants.findNextDicer(status);
 				}
+				
 			}
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block

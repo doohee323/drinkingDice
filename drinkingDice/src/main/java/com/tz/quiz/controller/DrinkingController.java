@@ -210,8 +210,8 @@ public class DrinkingController {
 		Player player2 = new Player(1, "Bob", 3);
 		players.add(player2);
 
-//		Player player3 = new Player(2, "Chris", 5);
-//		players.add(player3);
+		Player player3 = new Player(2, "Chris", 5);
+		players.add(player3);
 
 		return players;
 	}

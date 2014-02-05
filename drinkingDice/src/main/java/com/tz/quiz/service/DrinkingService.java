@@ -56,7 +56,7 @@ public class DrinkingService {
 				if (status.getPlayers().size() < 2) {
 					break;
 				}
-
+//				status.setbWin(false);
 				status.setnSecond(nSecond);
 
 				Thread.sleep(100);
@@ -96,10 +96,11 @@ public class DrinkingService {
 				}
 				status.setbWin(bWin);
 
+				pool.shutdown();
+				
 				// print status
 				status.logStatus();
 
-				pool.shutdown();
 				nSecond++;
 			}
 
