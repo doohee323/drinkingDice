@@ -16,7 +16,7 @@ import com.tz.quiz.support.Utils;
  * </pre>
  * 
  */
-public class Player extends Thread implements Callable<Status> {
+public class Player extends Thread implements Callable<StatusContext> {
 
 	private int sn = -1; // player sn
 	private boolean bTurn = false; // whether turn to dice or not
@@ -25,7 +25,7 @@ public class Player extends Thread implements Callable<Status> {
 	private int drinkingTime = 0; // left time to drink
 	private int drunkCnt = 0; // number which this player's already drunk
 	private int curDrunkSeq = -1; // current sequence to drink
-	private Status status = null;
+	private StatusContext context = null;
 
 	private List<Drinking> drinkings = new ArrayList<Drinking>(); // drinkings
 
@@ -50,31 +50,31 @@ public class Player extends Thread implements Callable<Status> {
 	 * callable method
 	 * </pre>
 	 * 
-	 * @return Status
+	 * @return StatusContext
 	 */
 	@Override
-	public Status call() throws Exception {
+	public StatusContext call() throws Exception {
 		try {
-			synchronized (status) {
+			synchronized (context) {
 				boolean bResn = false;
-				status.setSn(this.sn);
-				int pauseTime = status.getPausetime();
-				int nSecond = status.getnSecond();
+				context.setSn(this.sn);
+				int pauseTime = context.getPausetime();
+				int nSecond = context.getnSecond();
 				// Logger.debug(nSecond + " : I'm " + playerName);
 				if (bTurn) {
 					if (nSecond == 0 || (nSecond % pauseTime) == 0) {
 						dice();
 						boolean bWin = Utils.isWin(diceVale);
 						if (bWin) {
-							status.setbWin(true);
+							context.setbWin(true);
 							// choose driker at ramdon
 							int indx = getDrinkers(sn);
 							if (indx >= 0) {
-								status.getPlayerBySn(indx).addDrinking();
-								status.addLeftDrintCnt();
+								context.getPlayerBySn(indx).addDrinking();
+								context.addLeftDrintCnt();
 
-								// print status
-								logger.logStatus(status);
+								// print context
+								logger.logStatus(context);
 							}
 						}
 					}
@@ -82,37 +82,37 @@ public class Player extends Thread implements Callable<Status> {
 					// calculate for drinker's drinking time
 					if (drinkings.size() > 0) {
 						if (drinking()) { // true => finished
-							status.redueLeftDrintCnt();
+							context.redueLeftDrintCnt();
 						}
-						if (drunkCnt == status.getMaxDrinkingCnt()
+						if (drunkCnt == context.getMaxDrinkingCnt()
 								&& getLeftDrinkingTime() == 0) {
 							Logger.debug(nSecond + " / droped off :"
 									+ playerName);
-							status.removePlayer(playerName);
-							status = Utils.findNextDicer(status);
+							context.removePlayer(playerName);
+							context = Utils.findNextDicer(context);
 							bResn = true;
 
-							// print status
-							logger.logStatus(status);
+							// print context
+							logger.logStatus(context);
 						}
 					}
 				}
 				// check exist drinking player
-				boolean bDrinking = status.getLeftDrintCnt() > 0 ? true : false;
+				boolean bDrinking = context.getLeftDrintCnt() > 0 ? true : false;
 				if (!bDrinking && !bResn) {
 					// if else, find the next player who is'nt drinking
-					status = Utils.findNextDicer(status);
+					context = Utils.findNextDicer(context);
 				}
 			}
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
-		return status;
+		return context;
 	}
 
 	/**
 	 * <pre>
-	 * drinking status of players
+	 * drinking context of players
 	 * </pre>
 	 */
 	public class Drinking {
@@ -191,13 +191,13 @@ public class Player extends Thread implements Callable<Status> {
 
 		// get the left time to drink this drinking
 		int dringLeftTime = this.drinkings.get(curDrunkSeq).drinking();
-		Logger.debug(status.getnSecond() + " / " + this.playerName
+		Logger.debug(context.getnSecond() + " / " + this.playerName
 				+ " is drinking up to :" + dringLeftTime
 				+ ". and has next turn " + (this.drinkings.size() - 1));
 
 		// recalculate current drinking sequence (curDrunkSeq)
 		if (dringLeftTime == 0) {
-			Logger.debug(status.getnSecond() + " / finished drinking:"
+			Logger.debug(context.getnSecond() + " / finished drinking:"
 					+ playerName + " (" + curDrunkSeq + ")");
 			this.drinkings.get(curDrunkSeq).setFinished(true);
 			if ((this.drinkings.size() - 1) > curDrunkSeq) {
@@ -207,8 +207,8 @@ public class Player extends Thread implements Callable<Status> {
 			return true;
 		}
 
-		// print status
-		logger.logStatus(status);
+		// print context
+		logger.logStatus(context);
 
 		return false;
 	}
@@ -222,10 +222,10 @@ public class Player extends Thread implements Callable<Status> {
 	 * @return int next drinker's sn
 	 */
 	public int getDrinkers(int self) {
-		int maxDrintCnt = status.getMaxDrinkingCnt();
+		int maxDrintCnt = context.getMaxDrinkingCnt();
 
 		List<Player> players = new ArrayList<Player>();
-		Iterator<Player> e = status.getPlayers().iterator();
+		Iterator<Player> e = context.getPlayers().iterator();
 		while (e.hasNext()) {
 			Player player = e.next();
 			if (player.getSn() != self
@@ -252,7 +252,7 @@ public class Player extends Thread implements Callable<Status> {
 	 * @return boolean add drinking to list or not
 	 */
 	public boolean addDrinking() {
-		if (this.drinkings.size() < status.getMaxDrinkingCnt()) {
+		if (this.drinkings.size() < context.getMaxDrinkingCnt()) {
 			// when finished this drinking, move to the next drinking
 			if ((this.drinkings.size() - 1) == curDrunkSeq
 					&& getLeftDrinkingTime() == 0) {
@@ -260,7 +260,7 @@ public class Player extends Thread implements Callable<Status> {
 			}
 
 			this.drinkings.add(new Drinking());
-			Logger.debug(status.getnSecond() + " / add drinking:" + playerName
+			Logger.debug(context.getnSecond() + " / add drinking:" + playerName
 					+ " (" + (this.drinkings.size() - 1) + ")");
 
 			return true;
@@ -386,12 +386,12 @@ public class Player extends Thread implements Callable<Status> {
 		this.drinkings = drinkings;
 	}
 
-	public Status getStatus() {
-		return status;
+	public StatusContext getStatus() {
+		return context;
 	}
 
-	public void setStatus(Status status) {
-		this.status = status;
+	public void setStatus(StatusContext context) {
+		this.context = context;
 	}
 
 	private Logger logger = new Logger(); // print the logging

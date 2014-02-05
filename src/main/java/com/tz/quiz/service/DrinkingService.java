@@ -10,7 +10,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import com.tz.quiz.domain.Player;
-import com.tz.quiz.domain.Status;
+import com.tz.quiz.domain.StatusContext;
 import com.tz.quiz.support.Constants;
 import com.tz.quiz.support.Logger;
 
@@ -22,7 +22,7 @@ import com.tz.quiz.support.Logger;
  */
 public class DrinkingService {
 
-	private Status status = new Status(); // status for app.
+	private StatusContext context = new StatusContext(); // context for app.
 	private int pausetime = Constants.defaultRollSpeed; // rolling time
 	private int maxDrinkingCnt = Constants.defaultMaxDrinkingCnt; // maximum
 	private Logger logger = new Logger();
@@ -34,46 +34,46 @@ public class DrinkingService {
 	 * 
 	 * @param List
 	 *            <Player> players participants of game
-	 * @return Status status for app.
+	 * @return StatusContext context for app.
 	 */
-	public Status playDrinkingGame(List<Player> players) {
+	public StatusContext playDrinkingGame(List<Player> players) {
 
 		try {
 			// play with random roll or not
 			if (Constants.randomPlay) {
 				Collections.shuffle(players);
 			}
-			status.setPlayers(players);
-			status.setMaxDrinkingCnt(maxDrinkingCnt);
-			status.setPausetime(pausetime);
+			context.setPlayers(players);
+			context.setMaxDrinkingCnt(maxDrinkingCnt);
+			context.setPausetime(pausetime);
 
 			int nSecond = 0; // time by second
 			while (true) {
 
 				// if only one player is left, game finish
-				if (status.getPlayers().size() < 2) {
+				if (context.getPlayers().size() < 2) {
 					break;
 				}
-				// status.setbWin(false);
-				status.setnSecond(nSecond);
+				// context.setbWin(false);
+				context.setnSecond(nSecond);
 
 				Thread.sleep(100);
 
-				ExecutorService pool = Executors.newFixedThreadPool(status
+				ExecutorService pool = Executors.newFixedThreadPool(context
 						.getPlayers().size());
-				Set<Future<Status>> set = new HashSet<Future<Status>>();
+				Set<Future<StatusContext>> set = new HashSet<Future<StatusContext>>();
 
-				int sn = status.getSn();
-				for (int i = 0; i < status.getPlayers().size(); i++) {
-					Player player = status.getPlayers().get(i);
+				int sn = context.getSn();
+				for (int i = 0; i < context.getPlayers().size(); i++) {
+					Player player = context.getPlayers().get(i);
 					if (sn == player.getSn()) {
 						player.setbTurn(true);
 					} else {
 						player.setbTurn(false);
 					}
-					player.setStatus(status);
-					Callable<Status> callable = player;
-					Future<Status> future = pool.submit(callable);
+					player.setStatus(context);
+					Callable<StatusContext> callable = player;
+					Future<StatusContext> future = pool.submit(callable);
 					set.add(future);
 				}
 				pool.shutdown();
@@ -81,8 +81,8 @@ public class DrinkingService {
 				nSecond++;
 			}
 
-			// print status
-			logger.logEnd(status);
+			// print context
+			logger.logEnd(context);
 
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
@@ -90,7 +90,7 @@ public class DrinkingService {
 			e1.printStackTrace();
 		}
 
-		return status;
+		return context;
 	}
 
 	public int getPausetime() {

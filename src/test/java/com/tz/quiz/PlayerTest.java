@@ -12,7 +12,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.tz.quiz.domain.Player;
-import com.tz.quiz.domain.Status;
+import com.tz.quiz.domain.StatusContext;
 import com.tz.quiz.service.DrinkingService;
 import com.tz.quiz.support.Constants;
 import com.tz.quiz.support.Logger;
@@ -31,7 +31,7 @@ public class PlayerTest extends TestSupport {
 	@Test
 	public void runtTest() {
 		DrinkingService service = new DrinkingService();
-		Status status = new Status();
+		StatusContext context = new StatusContext();
 
 		// 1) making game
 		List<Player> players = new ArrayList<Player>();
@@ -61,12 +61,12 @@ public class PlayerTest extends TestSupport {
 
 		when("run service.drinkingPlayer");
 		{
-			status = service.playDrinkingGame(players);
+			context = service.playDrinkingGame(players);
 		}
 
-		then(status.getPlayers().size() + "'s winner is only 1.");
+		then(context.getPlayers().size() + "'s winner is only 1.");
 		{
-			assertThat(status.getPlayers().size(), is(1));
+			assertThat(context.getPlayers().size(), is(1));
 		}
 	}
 

@@ -3,7 +3,7 @@ package com.tz.quiz.support;
 import java.io.PrintWriter;
 
 import com.tz.quiz.domain.Player;
-import com.tz.quiz.domain.Status;
+import com.tz.quiz.domain.StatusContext;
 
 public class Logger extends PrintWriter {
 
@@ -63,19 +63,19 @@ public class Logger extends PrintWriter {
 
 	/**
 	 * <pre>
-	 * logging status
+	 * logging context
 	 * </pre>
 	 * 
 	 */
-	public void logStatus(Status status) {
+	public void logStatus(StatusContext context) {
 		// if (Constants.debug)
 		// return;
 
-		String addedDrinker = status.getAddedDrinker(); // added drinker name at last
-		String finishedDrinker = status.getFinishedDrinker(); // finished drinker name at last
-		String dropedDrinker = status.getDropedDrinker(); // dropped drinker name at last
+		String addedDrinker = context.getAddedDrinker(); // added drinker name at last
+		String finishedDrinker = context.getFinishedDrinker(); // finished drinker name at last
+		String dropedDrinker = context.getDropedDrinker(); // dropped drinker name at last
 		
-		if (status.isbWin() || addedDrinker != null
+		if (addedDrinker != null
 				|| finishedDrinker != null
 				|| dropedDrinker != null) {
 		} else {
@@ -83,12 +83,12 @@ public class Logger extends PrintWriter {
 		}
 
 		boolean bSpecial = false;
-		Player curPlayer = status.getCurPlayer();
+		Player curPlayer = context.getCurPlayer();
 		this.println("==== STATUS ====");
-		this.println("There are " + status.getPlayers().size() + " players.");
+		this.println("There are " + context.getPlayers().size() + " players.");
 		this.println("It is " + curPlayer.getPlayerName() + "'s turn.");
-		for (int i = 0; i < status.getPlayers().size(); i++) {
-			Player player = status.getPlayers().get(i);
+		for (int i = 0; i < context.getPlayers().size(); i++) {
+			Player player = context.getPlayers().get(i);
 			if (player.isNextDrinking()
 					&& player.getLeftDrinkingTime() != player.getDrinkingTime()) {
 				this.println(player.getPlayerName() + " has had "
@@ -127,7 +127,7 @@ public class Logger extends PrintWriter {
 		if (bSpecial) {
 			this.flush();
 		}
-		//status.setDropedDrinker(null);
+		//context.setDropedDrinker(null);
 	}
 
 	/**
@@ -136,20 +136,20 @@ public class Logger extends PrintWriter {
 	 * </pre>
 	 * 
 	 */
-	public void logEnd(Status status) {
+	public void logEnd(StatusContext context) {
 		// if (Constants.debug)
 		// return;
 
-		if (status.getFinishedDrinker() != null) {
-			this.println(status.getFinishedDrinker() + " is done drinking.");
+		if (context.getFinishedDrinker() != null) {
+			this.println(context.getFinishedDrinker() + " is done drinking.");
 		}
-		if (status.getDropedDrinker() != null) {
-			this.println(status.getDropedDrinker()
+		if (context.getDropedDrinker() != null) {
+			this.println(context.getDropedDrinker()
 					+ " says: 'I've had too many. I need to stop.'");
 		}
 		this.println("\n");
 
-		Player curPlayer = status.getCurPlayer();
+		Player curPlayer = context.getCurPlayer();
 		this.println("==== STATUS ====");
 		this.println("The game is over. " + curPlayer.getPlayerName()
 				+ "is the winner.");

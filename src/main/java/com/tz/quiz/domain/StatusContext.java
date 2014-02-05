@@ -10,11 +10,11 @@ import com.tz.quiz.support.Utils;
 
 /**
  * <pre>
- * model class for status of rolling
+ * model class for context of rolling
  * </pre>
  * 
  */
-public class Status {
+public class StatusContext {
 
 	private int sn = 0; // current turn's player's sn
 	private int nSecond = 0; // time (seconds)

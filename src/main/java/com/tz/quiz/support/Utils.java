@@ -6,7 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.tz.quiz.domain.Player;
-import com.tz.quiz.domain.Status;
+import com.tz.quiz.domain.StatusContext;
 
 /**
  * <pre>
@@ -63,10 +63,10 @@ public class Utils {
 	 *            roll <Player> current roll
 	 * @return Roll roll <Player> current roll
 	 */
-	public static Status findNextDicer(Status status) {
-		int sn = status.getSn();
+	public static StatusContext findNextDicer(StatusContext context) {
+		int sn = context.getSn();
 
-		Iterator<Player> e = status.getPlayers().iterator();
+		Iterator<Player> e = context.getPlayers().iterator();
 		while (e.hasNext()) {
 			Player player = e.next();
 			if (player.getSn() > sn) {
@@ -74,12 +74,12 @@ public class Utils {
 				break;
 			}
 		}
-		if (sn >= status.getPlayers().size()) {
-			sn = status.getPlayers().get(0).getSn();
+		if (sn >= context.getPlayers().size()) {
+			sn = context.getPlayers().get(0).getSn();
 		}
 
-		status.setSn(sn);
-		return status;
+		context.setSn(sn);
+		return context;
 	}
 
 }
