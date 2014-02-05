@@ -8,6 +8,7 @@ import java.util.concurrent.Callable;
 
 import com.tz.quiz.support.Constants;
 import com.tz.quiz.support.Logger;
+import com.tz.quiz.support.Utils;
 
 /**
  * <pre>
@@ -63,7 +64,7 @@ public class Player extends Thread implements Callable<Status> {
 				if (bTurn) {
 					if (nSecond == 0 || (nSecond % pauseTime) == 0) {
 						dice();
-						boolean bWin = Constants.isWin(diceVale);
+						boolean bWin = Utils.isWin(diceVale);
 						if (bWin) {
 							status.setbWin(true);
 							// choose driker at ramdon
@@ -84,9 +85,6 @@ public class Player extends Thread implements Callable<Status> {
 					if (drinkings.size() > 0) {
 						if (drinking()) { // true => finished
 							status.redueLeftDrintCnt();
-							// once finished drinking, can join rolling again
-							status = Constants.findNextDicer(status);
-
 							status.setFinishedDrinker(playerName);
 						}
 						if (drunkCnt == status.getMaxDrinkingCnt()
@@ -94,15 +92,10 @@ public class Player extends Thread implements Callable<Status> {
 							Logger.debug(nSecond + " / droped off :"
 									+ playerName);
 							status.removePlayer(playerName);
-							status = Constants.findNextDicer(status);
-
 							status.setDropedDrinker(playerName);
-
-							sn++;
-							if (sn >= status.getPlayers().size()) {
-								sn = status.getPlayers().get(0).getSn();
-							}
-							status.setSn(sn);
+							
+							status = Utils.findNextDicer(status);
+							
 							bResn = true;
 
 							// print status
@@ -114,7 +107,7 @@ public class Player extends Thread implements Callable<Status> {
 				boolean bDrinking = status.getLeftDrintCnt() > 0 ? true : false;
 				if (!bDrinking && !bResn) {
 					// if else, find the next player who is'nt drinking
-					status = Constants.findNextDicer(status);
+					status = Utils.findNextDicer(status);
 				}
 			}
 		} catch (Exception e1) {

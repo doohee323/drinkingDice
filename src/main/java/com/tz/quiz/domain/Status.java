@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.tz.quiz.support.Constants;
 import com.tz.quiz.support.Logger;
+import com.tz.quiz.support.Utils;
 
 /**
  * <pre>
@@ -98,7 +99,7 @@ public class Status {
 	}
 
 	public void removePlayer(String name) {
-		List<Player> newPlayers = Constants.clonePlayers(players, name);
+		List<Player> newPlayers = Utils.clonePlayers(players, name);
 		this.players = newPlayers;
 	}
 
