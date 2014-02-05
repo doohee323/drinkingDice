@@ -12,6 +12,7 @@ import java.util.concurrent.Future;
 import com.tz.quiz.domain.Player;
 import com.tz.quiz.domain.Status;
 import com.tz.quiz.support.Constants;
+import com.tz.quiz.support.Logger;
 
 /**
  * <pre>
@@ -24,6 +25,7 @@ public class DrinkingService {
 	private Status status = new Status();  // status for app.
 	private int pausetime = Constants.defaultRollSpeed; // rolling time
 	private int maxDrinkingCnt = Constants.defaultMaxDrinkingCnt; // maximum
+	private Logger logger = new Logger();
 
 	/**
 	 * <pre>

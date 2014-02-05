@@ -76,7 +76,7 @@ public class Player extends Thread implements Callable<Status> {
 										indx).getPlayerName());
 
 								// print status
-								logStatus();
+								logger.logStatus(status);
 							}
 						}
 					}
@@ -99,7 +99,7 @@ public class Player extends Thread implements Callable<Status> {
 							bResn = true;
 
 							// print status
-							logStatus();
+							logger.logStatus(status);
 						}
 					}
 				}
@@ -214,7 +214,7 @@ public class Player extends Thread implements Callable<Status> {
 		}
 
 		// print status
-		logStatus();
+		logger.logStatus(status);
 
 		return false;
 	}
@@ -315,73 +315,6 @@ public class Player extends Thread implements Callable<Status> {
 		return "a "
 				+ Integer.toString(Integer.parseInt(tmp[0])
 						+ Integer.parseInt(tmp[1]));
-	}
-
-	/**
-	 * <pre>
-	 * logging status
-	 * </pre>
-	 * 
-	 */
-	public void logStatus() {
-		// if (Constants.debug)
-		// return;
-
-		if (status.isbWin() || status.getAddedDrinker() != null
-				|| status.getFinishedDrinker() != null
-				|| status.getDropedDrinker() != null) {
-		} else {
-			return;
-		}
-
-		boolean bSpecial = false;
-		Player curPlayer = status.getCurPlayer();
-		logger.println("==== STATUS ====");
-		logger.println("There are " + status.getPlayers().size() + " players.");
-		logger.println("It is " + curPlayer.getPlayerName() + "'s turn.");
-		for (int i = 0; i < status.getPlayers().size(); i++) {
-			Player player = status.getPlayers().get(i);
-			if (player.isNextDrinking()
-					&& player.getLeftDrinkingTime() != player.getDrinkingTime()) {
-				logger.println(player.getPlayerName() + " has had "
-						+ player.getDrunkCnt()
-						+ " drinks and is currently drinking "
-						+ player.getLeftDrinkingCnt() + " more.");
-				bSpecial = true;
-			} else {
-				logger.println(player.getPlayerName() + " has had "
-						+ player.getDrunkCnt() + " drinks.");
-			}
-		}
-		logger.println("\n");
-		logger.println(curPlayer.getPlayerName() + "'s turn.");
-		logger.println("\n");
-		if (curPlayer.getDiceDisplayVale() != null) {
-			logger.println(curPlayer.getPlayerName() + " rolled "
-					+ curPlayer.getDiceDisplayVale());
-		}
-		// got assignment
-		if (status.getAddedDrinker() != null) {
-			logger.println(curPlayer.getPlayerName() + " says: '"
-					+ status.getAddedDrinker() + ", drink!'");
-			bSpecial = true;
-		}
-		if (status.getFinishedDrinker() != null) {
-			logger.println(status.getFinishedDrinker() + " is done drinking.");
-			bSpecial = true;
-		}
-		if (status.getDropedDrinker() != null) {
-			logger.println(status.getDropedDrinker()
-					+ " says: 'I've had too many. I need to stop.'");
-			bSpecial = true;
-		}
-		logger.println("\n");
-		if (bSpecial) {
-			logger.flush();
-		}
-		status.setAddedDrinker(null);
-		status.setFinishedDrinker(null);
-		status.setDropedDrinker(null);
 	}
 
 	/**
