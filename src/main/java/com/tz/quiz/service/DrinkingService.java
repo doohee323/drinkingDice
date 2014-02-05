@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -56,7 +55,7 @@ public class DrinkingService {
 				// status.setbWin(false);
 				status.setnSecond(nSecond);
 
-				Thread.sleep(500);
+				Thread.sleep(100);
 
 				ExecutorService pool = Executors.newFixedThreadPool(status
 						.getPlayers().size());
@@ -75,22 +74,6 @@ public class DrinkingService {
 					Future<Status> future = pool.submit(callable);
 					set.add(future);
 				}
-
-//				boolean bWin = false;
-//				for (Future<Status> future : set) {
-//					try {
-//						status = future.get();
-//						if (status.isbWin()) {
-//							bWin = true;
-//						}
-//					} catch (InterruptedException e) {
-//						e.printStackTrace();
-//					} catch (ExecutionException e) {
-//						e.printStackTrace();
-//					}
-//				}
-//				status.setbWin(bWin);
-
 				pool.shutdown();
 
 				nSecond++;
