@@ -24,7 +24,7 @@ public class Status {
 	private boolean bWin = false; // whether has winning value
 	private String addedDrinker = null; // added drinker name at last
 	private String finishedDrinker = null; // finished drinker name at last
-	private String dropedDrinker = null; // droped drinker name at last
+	private String dropedDrinker = null; // dropped drinker name at last
 
 	/**
 	 * <pre>
@@ -50,16 +50,16 @@ public class Status {
 		this.players = newPlayers;
 	}
 
+	public Player getCurPlayer() {
+		return getPlayerBySn(sn);
+	}
+
 	public int getSn() {
 		return sn;
 	}
 
 	public void setSn(int sn) {
 		this.sn = sn;
-	}
-
-	public Player getCurPlayer() {
-		return getPlayerBySn(sn);
 	}
 
 	public List<Player> getPlayers() {
