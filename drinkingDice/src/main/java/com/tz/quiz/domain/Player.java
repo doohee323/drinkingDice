@@ -40,7 +40,7 @@ public class Player extends Thread implements Callable<Status> {
 			synchronized (status) {
 				int pauseTime = status.getPausetime();
 				int nSecond = status.getnSecond();
-				//Logger.debug(nSecond + " : I'm " + playerName);
+				// Logger.debug(nSecond + " : I'm " + playerName);
 				if (bTurn) {
 					if (nSecond == 0 || (nSecond % pauseTime) == 0) {
 						dice();
@@ -54,6 +54,9 @@ public class Player extends Thread implements Callable<Status> {
 								status.addLeftDrintCnt();
 								status.setAddedDrinker(status.getPlayerBySn(
 										indx).getPlayerName());
+
+								// print status
+								logStatus();
 							}
 						}
 					}
@@ -75,6 +78,9 @@ public class Player extends Thread implements Callable<Status> {
 							status = Constants.findNextDicer(status);
 
 							status.setDropedDrinker(playerName);
+
+							// print status
+							logStatus();
 						}
 					}
 				}
@@ -85,7 +91,7 @@ public class Player extends Thread implements Callable<Status> {
 					// if else, find the next player who is'nt drinking
 					status = Constants.findNextDicer(status);
 				}
-				
+
 			}
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
@@ -192,6 +198,10 @@ public class Player extends Thread implements Callable<Status> {
 			drunkCnt++;
 			return true;
 		}
+		
+		// print status
+		logStatus();
+		
 		return false;
 	}
 
@@ -275,6 +285,8 @@ public class Player extends Thread implements Callable<Status> {
 	 * @return String
 	 */
 	public String getDiceDisplayVale() {
+		if (diceVale == null)
+			return null;
 		String tmp[] = diceVale.split(",");
 		if (tmp[0].equals(tmp[1])) {
 			return "double " + tmp[0] + "'s";
@@ -367,4 +379,86 @@ public class Player extends Thread implements Callable<Status> {
 		this.status = status;
 	}
 
+	private Logger logger = new Logger(); // print the logging
+
+	// logging status
+	public void logStatus() {
+		// if (Constants.debug)
+		// return;
+
+		if (status.isbWin() || status.getAddedDrinker() != null
+				|| status.getFinishedDrinker() != null
+				|| status.getDropedDrinker() != null) {
+		} else {
+			return;
+		}
+
+		Player curPlayer = status.getCurPlayer();
+		logger.println("==== STATUS ====");
+		logger.println("There are " + status.getPlayers().size() + " players.");
+		logger.println("It is " + curPlayer.getPlayerName() + "'s turn.");
+		for (int i = 0; i < status.getPlayers().size(); i++) {
+			Player player = status.getPlayers().get(i);
+			if (player.isNextDrinking()
+					&& player.getLeftDrinkingTime() != player.getDrinkingTime()) {
+				logger.println(player.getPlayerName() + " has had "
+						+ player.getDrunkCnt()
+						+ " drinks and is currently drinking "
+						+ player.getLeftDrinkingCnt() + " more.");
+			} else {
+				logger.println(player.getPlayerName() + " has had "
+						+ player.getDrunkCnt() + " drinks.");
+			}
+		}
+		logger.println("\n");
+		logger.println(curPlayer.getPlayerName() + "'s turn.");
+		logger.println("\n");
+		if (curPlayer.getDiceDisplayVale() != null) {
+			logger.println(curPlayer.getPlayerName() + " rolled "
+					+ curPlayer.getDiceDisplayVale());
+		}
+		// got assignment
+		if (status.getAddedDrinker() != null) {
+			logger.println(curPlayer.getPlayerName() + " says: '"
+					+ status.getAddedDrinker() + ", drink!'");
+		}
+		if (status.getFinishedDrinker() != null) {
+			logger.println(status.getFinishedDrinker() + " is done drinking.");
+		}
+		if (status.getDropedDrinker() != null) {
+			logger.println(status.getDropedDrinker()
+					+ " says: 'I've had too many. I need to stop.'");
+		}
+		logger.println("\n");
+		logger.flush();
+		status.setAddedDrinker(null);
+		status.setFinishedDrinker(null);
+		status.setDropedDrinker(null);
+	}
+
+	// logging end
+	public void logEnd() {
+		// if (Constants.debug)
+		// return;
+
+		if (status.getFinishedDrinker() != null) {
+			logger.println(status.getFinishedDrinker() + " is done drinking.");
+		}
+		if (status.getDropedDrinker() != null) {
+			logger.println(status.getDropedDrinker()
+					+ " says: 'I've had too many. I need to stop.'");
+		}
+		logger.println("\n");
+
+		Player curPlayer = status.getCurPlayer();
+		logger.println("==== STATUS ====");
+		logger.println("The game is over. " + curPlayer.getPlayerName()
+				+ "is the winner.");
+		logger.println("\n");
+		logger.println(curPlayer.getPlayerName() + "is the winner!");
+		logger.flush();
+		status.setAddedDrinker(null);
+		status.setFinishedDrinker(null);
+		status.setDropedDrinker(null);
+	}
 }

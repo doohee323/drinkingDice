@@ -98,9 +98,6 @@ public class DrinkingService {
 
 				pool.shutdown();
 				
-				// print status
-				status.logStatus();
-
 				nSecond++;
 			}
 

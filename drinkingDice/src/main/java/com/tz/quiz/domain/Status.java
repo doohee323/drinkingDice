@@ -27,58 +27,6 @@ public class Status {
 	private String dropedDrinker = null; // droped drinker name at last
 	private Logger logger = new Logger(); // print the logging
 
-	// logging status
-	public void logStatus() {
-		// if (Constants.debug)
-		// return;
-
-		if (bWin || addedDrinker != null || finishedDrinker != null
-				|| dropedDrinker != null) {
-		} else {
-			return;
-		}
-
-		Player curPlayer = getCurPlayer();
-		logger.println("==== STATUS ====");
-		logger.println("There are " + players.size() + " players.");
-		logger.println("It is " + curPlayer.getPlayerName() + "'s turn.");
-		for (int i = 0; i < players.size(); i++) {
-			Player player = players.get(i);
-			if (player.isNextDrinking()
-					&& player.getLeftDrinkingTime() != player.getDrinkingTime()) {
-				logger.println(player.getPlayerName() + " has had "
-						+ player.getDrunkCnt()
-						+ " drinks and is currently drinking "
-						+ player.getLeftDrinkingCnt() + " more.");
-			} else {
-				logger.println(player.getPlayerName() + " has had "
-						+ player.getDrunkCnt() + " drinks.");
-			}
-		}
-		logger.println("\n");
-		logger.println(curPlayer.getPlayerName() + "'s turn.");
-		logger.println("\n");
-		logger.println(curPlayer.getPlayerName() + " rolled "
-				+ curPlayer.getDiceDisplayVale());
-		// got assignment
-		if (addedDrinker != null) {
-			logger.println(curPlayer.getPlayerName() + " says: '"
-					+ addedDrinker + ", drink!'");
-		}
-		if (finishedDrinker != null) {
-			logger.println(finishedDrinker + " is done drinking.");
-		}
-		if (dropedDrinker != null) {
-			logger.println(dropedDrinker
-					+ " says: 'I've had too many. I need to stop.'");
-		}
-		logger.println("\n");
-		//logger.flush();
-		addedDrinker = null;
-		finishedDrinker = null;
-		dropedDrinker = null;
-	}
-
 	// logging end
 	public void logEnd() {
 		// if (Constants.debug)
