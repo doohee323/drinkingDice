@@ -17,10 +17,10 @@ public class DrinkingController {
 
 		// 1) define players
 		// run with screen input
-		List<Player> players = console(service);
+//		List<Player> players = console(service);
 
 		// run with predefined input
-		//		 List<Player> players = manual(service);
+				 List<Player> players = manual(service);
 
 		// 2) run the game
 		service.playDrinkingGame(players);
@@ -199,7 +199,7 @@ public class DrinkingController {
 
 		// 1) making game
 		Constants.randomPlay = false;
-		Constants.debug = true;
+		Constants.debug = false;
 		service.setMaxDrinkingCnt(2);
 		service.setPausetime(2);
 

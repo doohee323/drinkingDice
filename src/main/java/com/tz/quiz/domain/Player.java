@@ -55,6 +55,8 @@ public class Player extends Thread implements Callable<Status> {
 	public Status call() throws Exception {
 		try {
 			synchronized (status) {
+				boolean bResn = false;
+				status.setSn(this.sn);
 				int pauseTime = status.getPausetime();
 				int nSecond = status.getnSecond();
 				// Logger.debug(nSecond + " : I'm " + playerName);
@@ -96,6 +98,13 @@ public class Player extends Thread implements Callable<Status> {
 
 							status.setDropedDrinker(playerName);
 
+							sn++;
+							if (sn >= status.getPlayers().size()) {
+								sn = status.getPlayers().get(0).getSn();
+							}
+							status.setSn(sn);
+							bResn = true;
+
 							// print status
 							logStatus();
 						}
@@ -103,7 +112,7 @@ public class Player extends Thread implements Callable<Status> {
 				}
 				// check exist drinking player
 				boolean bDrinking = status.getLeftDrintCnt() > 0 ? true : false;
-				if (!bDrinking) {
+				if (!bDrinking && !bResn) {
 					// if else, find the next player who is'nt drinking
 					status = Constants.findNextDicer(status);
 				}
@@ -332,6 +341,7 @@ public class Player extends Thread implements Callable<Status> {
 			return;
 		}
 
+		boolean bSpecial = false;
 		Player curPlayer = status.getCurPlayer();
 		logger.println("==== STATUS ====");
 		logger.println("There are " + status.getPlayers().size() + " players.");
@@ -344,6 +354,7 @@ public class Player extends Thread implements Callable<Status> {
 						+ player.getDrunkCnt()
 						+ " drinks and is currently drinking "
 						+ player.getLeftDrinkingCnt() + " more.");
+				bSpecial = true;
 			} else {
 				logger.println(player.getPlayerName() + " has had "
 						+ player.getDrunkCnt() + " drinks.");
@@ -360,16 +371,21 @@ public class Player extends Thread implements Callable<Status> {
 		if (status.getAddedDrinker() != null) {
 			logger.println(curPlayer.getPlayerName() + " says: '"
 					+ status.getAddedDrinker() + ", drink!'");
+			bSpecial = true;
 		}
 		if (status.getFinishedDrinker() != null) {
 			logger.println(status.getFinishedDrinker() + " is done drinking.");
+			bSpecial = true;
 		}
 		if (status.getDropedDrinker() != null) {
 			logger.println(status.getDropedDrinker()
 					+ " says: 'I've had too many. I need to stop.'");
+			bSpecial = true;
 		}
 		logger.println("\n");
-		logger.flush();
+		if (bSpecial) {
+			logger.flush();
+		}
 		status.setAddedDrinker(null);
 		status.setFinishedDrinker(null);
 		status.setDropedDrinker(null);

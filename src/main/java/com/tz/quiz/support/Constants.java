@@ -77,26 +77,26 @@ public class Constants {
 	 * @return Roll roll <Player> current roll
 	 */
 	public static Status findNextDicer(Status status) {
-		int nTurn = status.getnTurn();
+		int sn = status.getSn();
 		// if there is no one drinking, turn change.
 		if (status.getLeftDrintCnt() == 0) {
-			nTurn++;
+			sn++;
 		}
 
 		// if the next player is drinking, then the turn pass to the next one.
-		// nTurn++;
-		// for (int i = nTurn; i < roll.getPlayers().size(); i++) {
+		// sn++;
+		// for (int i = sn; i < roll.getPlayers().size(); i++) {
 		// if(roll.getPlayers().get(i).getLeftDrinkingTime() == 0) {
 		// break;
 		// } else {
-		// nTurn++;
+		// sn++;
 		// }
 		// }
 
-		if (nTurn >= status.getPlayers().size()) {
-			nTurn = 0;
+		if (sn >= status.getPlayers().size()) {
+			sn = status.getPlayers().get(0).getSn();;
 		}
-		status.setnTurn(nTurn);
+		status.setSn(sn);
 		return status;
 	}
 }

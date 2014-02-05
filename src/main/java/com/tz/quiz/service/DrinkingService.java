@@ -56,16 +56,16 @@ public class DrinkingService {
 				// status.setbWin(false);
 				status.setnSecond(nSecond);
 
-				Thread.sleep(100);
+				Thread.sleep(500);
 
 				ExecutorService pool = Executors.newFixedThreadPool(status
 						.getPlayers().size());
 				Set<Future<Status>> set = new HashSet<Future<Status>>();
 
-				int nTurn = status.getnTurn();
+				int sn = status.getSn();
 				for (int i = 0; i < status.getPlayers().size(); i++) {
 					Player player = status.getPlayers().get(i);
-					if (nTurn == player.getSn()) {
+					if (sn == player.getSn()) {
 						player.setbTurn(true);
 					} else {
 						player.setbTurn(false);

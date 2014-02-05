@@ -15,7 +15,7 @@ import com.tz.quiz.support.Logger;
  */
 public class Status {
 
-	private int nTurn = 0; // current turn's player's index
+	private int sn = 0; // current turn's player's sn
 	private int nSecond = 0; // time (seconds)
 	private int pausetime = Constants.defaultRollSpeed; // rolling time
 	private int maxDrinkingCnt = Constants.defaultMaxDrinkingCnt; // maximum
@@ -77,16 +77,16 @@ public class Status {
 		dropedDrinker = null;
 	}
 
-	public int getnTurn() {
-		return nTurn;
+	public int getSn() {
+		return sn;
 	}
 
-	public void setnTurn(int nTurn) {
-		this.nTurn = nTurn;
+	public void setSn(int sn) {
+		this.sn = sn;
 	}
 
 	public Player getCurPlayer() {
-		return getPlayers().get(nTurn);
+		return getPlayerBySn(sn);
 	}
 
 	public List<Player> getPlayers() {
