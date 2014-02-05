@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import com.tz.quiz.domain.Player.Drinking;
 import com.tz.quiz.support.Constants;
 import com.tz.quiz.support.Utils;
 
@@ -22,8 +23,6 @@ public class Status {
 	private int leftDrintCnt = 0; // number of drinking player at this moment
 	private List<Player> players = new ArrayList<Player>();
 	private boolean bWin = false; // whether has winning value
-	private String addedDrinker = null; // added drinker name at last
-	private String finishedDrinker = null; // finished drinker name at last
 	private String dropedDrinker = null; // dropped drinker name at last
 
 	/**
@@ -45,9 +44,56 @@ public class Status {
 		return null;
 	}
 
+	/**
+	 * <pre>
+	 * get playerName who is pointed to drink
+	 * </pre>
+	 * 
+	 * @return String	playerName
+	 */
+	public String getAddedDrinker() {
+		Iterator<Player> e = players.iterator();
+		while (e.hasNext()) {
+			Player player = e.next();
+			List<Drinking> drinkings = player.getDrinkings();
+			Iterator<Drinking> e1 = drinkings.iterator();
+			while (e1.hasNext()) {
+				Drinking drinking = e1.next();
+				if (drinking.isAdded()){
+					return player.getPlayerName();
+				}
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * <pre>
+	 * get playerName who drunk
+	 * </pre>
+	 * 
+	 * @return String	playerName
+	 */
+	public String getFinishedDrinker() {
+		Iterator<Player> e = players.iterator();
+		while (e.hasNext()) {
+			Player player = e.next();
+			List<Drinking> drinkings = player.getDrinkings();
+			Iterator<Drinking> e1 = drinkings.iterator();
+			while (e1.hasNext()) {
+				Drinking drinking = e1.next();
+				if (drinking.isFinished()){
+					return player.getPlayerName();
+				}
+			}
+		}
+		return null;
+	}
+
 	public void removePlayer(String name) {
 		List<Player> newPlayers = Utils.clonePlayers(players, name);
 		this.players = newPlayers;
+		this.setDropedDrinker(name);
 	}
 
 	public Player getCurPlayer() {
@@ -82,14 +128,6 @@ public class Status {
 		this.leftDrintCnt--;
 	}
 
-	public String getAddedDrinker() {
-		return addedDrinker;
-	}
-
-	public void setAddedDrinker(String addedDrinker) {
-		this.addedDrinker = addedDrinker;
-	}
-
 	public int getMaxDrinkingCnt() {
 		return maxDrinkingCnt;
 	}
@@ -104,14 +142,6 @@ public class Status {
 
 	public void setnSecond(int nSecond) {
 		this.nSecond = nSecond;
-	}
-
-	public String getFinishedDrinker() {
-		return finishedDrinker;
-	}
-
-	public void setFinishedDrinker(String finishedDrinker) {
-		this.finishedDrinker = finishedDrinker;
 	}
 
 	public String getDropedDrinker() {

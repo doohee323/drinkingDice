@@ -72,8 +72,6 @@ public class Player extends Thread implements Callable<Status> {
 							if (indx >= 0) {
 								status.getPlayerBySn(indx).addDrinking();
 								status.addLeftDrintCnt();
-								status.setAddedDrinker(status.getPlayerBySn(
-										indx).getPlayerName());
 
 								// print status
 								logger.logStatus(status);
@@ -85,17 +83,13 @@ public class Player extends Thread implements Callable<Status> {
 					if (drinkings.size() > 0) {
 						if (drinking()) { // true => finished
 							status.redueLeftDrintCnt();
-							status.setFinishedDrinker(playerName);
 						}
 						if (drunkCnt == status.getMaxDrinkingCnt()
 								&& getLeftDrinkingTime() == 0) {
 							Logger.debug(nSecond + " / droped off :"
 									+ playerName);
 							status.removePlayer(playerName);
-							status.setDropedDrinker(playerName);
-							
 							status = Utils.findNextDicer(status);
-							
 							bResn = true;
 
 							// print status

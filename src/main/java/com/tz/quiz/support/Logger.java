@@ -71,9 +71,13 @@ public class Logger extends PrintWriter {
 		// if (Constants.debug)
 		// return;
 
-		if (status.isbWin() || status.getAddedDrinker() != null
-				|| status.getFinishedDrinker() != null
-				|| status.getDropedDrinker() != null) {
+		String addedDrinker = status.getAddedDrinker(); // added drinker name at last
+		String finishedDrinker = status.getFinishedDrinker(); // finished drinker name at last
+		String dropedDrinker = status.getDropedDrinker(); // dropped drinker name at last
+		
+		if (status.isbWin() || addedDrinker != null
+				|| finishedDrinker != null
+				|| dropedDrinker != null) {
 		} else {
 			return;
 		}
@@ -105,17 +109,17 @@ public class Logger extends PrintWriter {
 					+ curPlayer.getDiceDisplayVale());
 		}
 		// got assignment
-		if (status.getAddedDrinker() != null) {
+		if (addedDrinker != null) {
 			this.println(curPlayer.getPlayerName() + " says: '"
-					+ status.getAddedDrinker() + ", drink!'");
+					+ addedDrinker + ", drink!'");
 			bSpecial = true;
 		}
-		if (status.getFinishedDrinker() != null) {
-			this.println(status.getFinishedDrinker() + " is done drinking.");
+		if (finishedDrinker != null) {
+			this.println(finishedDrinker + " is done drinking.");
 			bSpecial = true;
 		}
-		if (status.getDropedDrinker() != null) {
-			this.println(status.getDropedDrinker()
+		if (dropedDrinker != null) {
+			this.println(dropedDrinker
 					+ " says: 'I've had too many. I need to stop.'");
 			bSpecial = true;
 		}
@@ -123,9 +127,7 @@ public class Logger extends PrintWriter {
 		if (bSpecial) {
 			this.flush();
 		}
-		status.setAddedDrinker(null);
-		status.setFinishedDrinker(null);
-		status.setDropedDrinker(null);
+		//status.setDropedDrinker(null);
 	}
 
 	/**
@@ -154,9 +156,6 @@ public class Logger extends PrintWriter {
 		this.println("\n");
 		this.println(curPlayer.getPlayerName() + "is the winner!");
 		this.flush();
-		status.setAddedDrinker(null);
-		status.setFinishedDrinker(null);
-		status.setDropedDrinker(null);
 	}
 
 }
