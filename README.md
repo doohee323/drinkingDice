@@ -1,4 +1,4 @@
-playerDrinking
+drinkingDice
 ===========
 
 ## Run
