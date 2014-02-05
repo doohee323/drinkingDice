@@ -22,7 +22,7 @@ import com.tz.quiz.support.Constants;
  */
 public class DrinkingService {
 
-	private Status status = new Status();
+	private Status status = new Status();  // status for app.
 	private int pausetime = Constants.defaultRollSpeed; // rolling time
 	private int maxDrinkingCnt = Constants.defaultMaxDrinkingCnt; // maximum
 
@@ -32,11 +32,8 @@ public class DrinkingService {
 	 * </pre>
 	 * 
 	 * @param List
-	 *            <Player> input player to be cloned
-	 * @param List
 	 *            <Player> players participants of game
-	 * @return roll output roll itself
-	 * @throws InterruptedException
+	 * @return Status status for app.
 	 */
 	public Status playDrinkingGame(List<Player> players) {
 
@@ -56,7 +53,7 @@ public class DrinkingService {
 				if (status.getPlayers().size() < 2) {
 					break;
 				}
-//				status.setbWin(false);
+				// status.setbWin(false);
 				status.setnSecond(nSecond);
 
 				Thread.sleep(100);
@@ -87,17 +84,15 @@ public class DrinkingService {
 							bWin = true;
 						}
 					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					} catch (ExecutionException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
 				status.setbWin(bWin);
 
 				pool.shutdown();
-				
+
 				nSecond++;
 			}
 
@@ -105,10 +100,8 @@ public class DrinkingService {
 			status.logEnd();
 
 		} catch (InterruptedException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		} catch (Exception e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 

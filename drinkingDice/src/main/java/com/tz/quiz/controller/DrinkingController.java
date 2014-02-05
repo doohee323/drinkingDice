@@ -10,18 +10,19 @@ import com.tz.quiz.service.DrinkingService;
 import com.tz.quiz.support.Constants;
 
 public class DrinkingController {
+	
 	public static void main(String[] args) {
 
 		DrinkingService service = new DrinkingService();
 
-		// 2) define players
+		// 1) define players
 		// run with screen input
-		// List<Player> players = console(service);
+		List<Player> players = console(service);
 
-		// // run with predefined input
-		List<Player> players = manual(service);
+		// run with predefined input
+		// List<Player> players = manual(service);
 
-		// 3) run the game
+		// 2) run the game
 		service.playDrinkingGame(players);
 
 		return;

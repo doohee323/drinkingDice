@@ -27,7 +27,31 @@ public class Status {
 	private String dropedDrinker = null; // droped drinker name at last
 	private Logger logger = new Logger(); // print the logging
 
-	// logging end
+	/**
+	 * <pre>
+	 * get from list by player's sn
+	 * </pre>
+	 * 
+	 * @param int player's sn
+	 * @return Player
+	 */
+	public Player getPlayerBySn(int sn) {
+		Iterator<Player> e = players.iterator();
+		while (e.hasNext()) {
+			Player player = e.next();
+			if (player.getSn() == sn) {
+				return player;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * <pre>
+	 * logging end
+	 * </pre>
+	 * 
+	 */
 	public void logEnd() {
 		// if (Constants.debug)
 		// return;
@@ -47,7 +71,7 @@ public class Status {
 				+ "is the winner.");
 		logger.println("\n");
 		logger.println(curPlayer.getPlayerName() + "is the winner!");
-		//logger.flush();
+		logger.flush();
 		addedDrinker = null;
 		finishedDrinker = null;
 		dropedDrinker = null;
@@ -63,17 +87,6 @@ public class Status {
 
 	public Player getCurPlayer() {
 		return getPlayers().get(nTurn);
-	}
-
-	public Player getPlayerBySn(int sn) {
-		Iterator<Player> e = players.iterator();
-		while (e.hasNext()) {
-			Player player = e.next();
-			if (player.getSn() == sn) {
-				return player;
-			}
-		}
-		return null;
 	}
 
 	public List<Player> getPlayers() {

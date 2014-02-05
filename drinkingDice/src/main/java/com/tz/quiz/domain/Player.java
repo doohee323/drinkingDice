@@ -24,16 +24,33 @@ public class Player extends Thread implements Callable<Status> {
 	private int drinkingTime = 0; // left time to drink
 	private int drunkCnt = 0; // number which this player's already drunk
 	private int curDrunkSeq = -1; // current sequence to drink
-	private Status status = new Status();
+	private Status status = null;
 
-	private List<Drinking> drinkings = new ArrayList<Drinking>(); // drinkings
+	private List<Drinking> drinkings = null; // drinkings
 
+	/**
+	 * <pre>
+	 * constructor for player
+	 * </pre>
+	 * 
+	 * @param int sn player's sn
+	 * @param String
+	 *            name player's name
+	 * @param int drinkingTime player's time to drink
+	 */
 	public Player(int sn, String name, int drinkingTime) {
 		this.sn = sn;
 		this.playerName = name;
 		this.drinkingTime = drinkingTime;
 	}
 
+	/**
+	 * <pre>
+	 * callable method
+	 * </pre>
+	 * 
+	 * @return Status
+	 */
 	@Override
 	public Status call() throws Exception {
 		try {
@@ -48,7 +65,7 @@ public class Player extends Thread implements Callable<Status> {
 						if (bWin) {
 							status.setbWin(true);
 							// choose driker at ramdon
-							int indx = getDrinkers(status, sn);
+							int indx = getDrinkers(sn);
 							if (indx >= 0) {
 								status.getPlayerBySn(indx).addDrinking();
 								status.addLeftDrintCnt();
@@ -84,20 +101,16 @@ public class Player extends Thread implements Callable<Status> {
 						}
 					}
 				}
-
 				// check exist drinking player
 				boolean bDrinking = status.getLeftDrintCnt() > 0 ? true : false;
 				if (!bDrinking) {
 					// if else, find the next player who is'nt drinking
 					status = Constants.findNextDicer(status);
 				}
-
 			}
 		} catch (Exception e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-
 		return status;
 	}
 
@@ -166,7 +179,6 @@ public class Player extends Thread implements Callable<Status> {
 	 * drinking operation
 	 * </pre>
 	 * 
-	 * @param int nSecond second for logging
 	 * @return boolean finished this drinking or not
 	 */
 	public boolean drinking() {
@@ -198,17 +210,24 @@ public class Player extends Thread implements Callable<Status> {
 			drunkCnt++;
 			return true;
 		}
-		
+
 		// print status
 		logStatus();
-		
+
 		return false;
 	}
 
-	public int getDrinkers(Status status, int self) {
+	/**
+	 * <pre>
+	 * get next drinker's sn except self
+	 * </pre>
+	 * 
+	 * @param int self dicer's sn
+	 * @return int next drinker's sn
+	 */
+	public int getDrinkers(int self) {
 		int maxDrintCnt = status.getMaxDrinkingCnt();
 
-		// choose driker at ramdon
 		List<Player> players = new ArrayList<Player>();
 		Iterator<Player> e = status.getPlayers().iterator();
 		while (e.hasNext()) {
@@ -219,6 +238,7 @@ public class Player extends Thread implements Callable<Status> {
 			}
 		}
 
+		// choose driker at ramdon
 		// play with random roll or not
 		if (Constants.radomPlay) {
 			Collections.shuffle(players);
@@ -233,7 +253,6 @@ public class Player extends Thread implements Callable<Status> {
 	 * add a drinking to drink to the list
 	 * </pre>
 	 * 
-	 * @param int nSecond second for logging
 	 * @return boolean add drinking to list or not
 	 */
 	public boolean addDrinking() {
@@ -294,6 +313,66 @@ public class Player extends Thread implements Callable<Status> {
 		return "a "
 				+ Integer.toString(Integer.parseInt(tmp[0])
 						+ Integer.parseInt(tmp[1]));
+	}
+
+	/**
+	 * <pre>
+	 * logging status
+	 * </pre>
+	 * 
+	 */
+	public void logStatus() {
+		// if (Constants.debug)
+		// return;
+
+		if (status.isbWin() || status.getAddedDrinker() != null
+				|| status.getFinishedDrinker() != null
+				|| status.getDropedDrinker() != null) {
+		} else {
+			return;
+		}
+
+		Player curPlayer = status.getCurPlayer();
+		logger.println("==== STATUS ====");
+		logger.println("There are " + status.getPlayers().size() + " players.");
+		logger.println("It is " + curPlayer.getPlayerName() + "'s turn.");
+		for (int i = 0; i < status.getPlayers().size(); i++) {
+			Player player = status.getPlayers().get(i);
+			if (player.isNextDrinking()
+					&& player.getLeftDrinkingTime() != player.getDrinkingTime()) {
+				logger.println(player.getPlayerName() + " has had "
+						+ player.getDrunkCnt()
+						+ " drinks and is currently drinking "
+						+ player.getLeftDrinkingCnt() + " more.");
+			} else {
+				logger.println(player.getPlayerName() + " has had "
+						+ player.getDrunkCnt() + " drinks.");
+			}
+		}
+		logger.println("\n");
+		logger.println(curPlayer.getPlayerName() + "'s turn.");
+		logger.println("\n");
+		if (curPlayer.getDiceDisplayVale() != null) {
+			logger.println(curPlayer.getPlayerName() + " rolled "
+					+ curPlayer.getDiceDisplayVale());
+		}
+		// got assignment
+		if (status.getAddedDrinker() != null) {
+			logger.println(curPlayer.getPlayerName() + " says: '"
+					+ status.getAddedDrinker() + ", drink!'");
+		}
+		if (status.getFinishedDrinker() != null) {
+			logger.println(status.getFinishedDrinker() + " is done drinking.");
+		}
+		if (status.getDropedDrinker() != null) {
+			logger.println(status.getDropedDrinker()
+					+ " says: 'I've had too many. I need to stop.'");
+		}
+		logger.println("\n");
+		logger.flush();
+		status.setAddedDrinker(null);
+		status.setFinishedDrinker(null);
+		status.setDropedDrinker(null);
 	}
 
 	/**
@@ -380,85 +459,4 @@ public class Player extends Thread implements Callable<Status> {
 	}
 
 	private Logger logger = new Logger(); // print the logging
-
-	// logging status
-	public void logStatus() {
-		// if (Constants.debug)
-		// return;
-
-		if (status.isbWin() || status.getAddedDrinker() != null
-				|| status.getFinishedDrinker() != null
-				|| status.getDropedDrinker() != null) {
-		} else {
-			return;
-		}
-
-		Player curPlayer = status.getCurPlayer();
-		logger.println("==== STATUS ====");
-		logger.println("There are " + status.getPlayers().size() + " players.");
-		logger.println("It is " + curPlayer.getPlayerName() + "'s turn.");
-		for (int i = 0; i < status.getPlayers().size(); i++) {
-			Player player = status.getPlayers().get(i);
-			if (player.isNextDrinking()
-					&& player.getLeftDrinkingTime() != player.getDrinkingTime()) {
-				logger.println(player.getPlayerName() + " has had "
-						+ player.getDrunkCnt()
-						+ " drinks and is currently drinking "
-						+ player.getLeftDrinkingCnt() + " more.");
-			} else {
-				logger.println(player.getPlayerName() + " has had "
-						+ player.getDrunkCnt() + " drinks.");
-			}
-		}
-		logger.println("\n");
-		logger.println(curPlayer.getPlayerName() + "'s turn.");
-		logger.println("\n");
-		if (curPlayer.getDiceDisplayVale() != null) {
-			logger.println(curPlayer.getPlayerName() + " rolled "
-					+ curPlayer.getDiceDisplayVale());
-		}
-		// got assignment
-		if (status.getAddedDrinker() != null) {
-			logger.println(curPlayer.getPlayerName() + " says: '"
-					+ status.getAddedDrinker() + ", drink!'");
-		}
-		if (status.getFinishedDrinker() != null) {
-			logger.println(status.getFinishedDrinker() + " is done drinking.");
-		}
-		if (status.getDropedDrinker() != null) {
-			logger.println(status.getDropedDrinker()
-					+ " says: 'I've had too many. I need to stop.'");
-		}
-		logger.println("\n");
-		logger.flush();
-		status.setAddedDrinker(null);
-		status.setFinishedDrinker(null);
-		status.setDropedDrinker(null);
-	}
-
-	// logging end
-	public void logEnd() {
-		// if (Constants.debug)
-		// return;
-
-		if (status.getFinishedDrinker() != null) {
-			logger.println(status.getFinishedDrinker() + " is done drinking.");
-		}
-		if (status.getDropedDrinker() != null) {
-			logger.println(status.getDropedDrinker()
-					+ " says: 'I've had too many. I need to stop.'");
-		}
-		logger.println("\n");
-
-		Player curPlayer = status.getCurPlayer();
-		logger.println("==== STATUS ====");
-		logger.println("The game is over. " + curPlayer.getPlayerName()
-				+ "is the winner.");
-		logger.println("\n");
-		logger.println(curPlayer.getPlayerName() + "is the winner!");
-		logger.flush();
-		status.setAddedDrinker(null);
-		status.setFinishedDrinker(null);
-		status.setDropedDrinker(null);
-	}
 }
