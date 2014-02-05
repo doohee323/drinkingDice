@@ -22,7 +22,7 @@ import com.tz.quiz.support.Logger;
  */
 public class DrinkingService {
 
-	private Status status = new Status();  // status for app.
+	private Status status = new Status(); // status for app.
 	private int pausetime = Constants.defaultRollSpeed; // rolling time
 	private int maxDrinkingCnt = Constants.defaultMaxDrinkingCnt; // maximum
 	private Logger logger = new Logger();
@@ -82,7 +82,7 @@ public class DrinkingService {
 			}
 
 			// print status
-			status.logEnd();
+			logger.logEnd(status);
 
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();

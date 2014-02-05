@@ -128,5 +128,35 @@ public class Logger extends PrintWriter {
 		status.setDropedDrinker(null);
 	}
 
+	/**
+	 * <pre>
+	 * logging end
+	 * </pre>
+	 * 
+	 */
+	public void logEnd(Status status) {
+		// if (Constants.debug)
+		// return;
+
+		if (status.getFinishedDrinker() != null) {
+			this.println(status.getFinishedDrinker() + " is done drinking.");
+		}
+		if (status.getDropedDrinker() != null) {
+			this.println(status.getDropedDrinker()
+					+ " says: 'I've had too many. I need to stop.'");
+		}
+		this.println("\n");
+
+		Player curPlayer = status.getCurPlayer();
+		this.println("==== STATUS ====");
+		this.println("The game is over. " + curPlayer.getPlayerName()
+				+ "is the winner.");
+		this.println("\n");
+		this.println(curPlayer.getPlayerName() + "is the winner!");
+		this.flush();
+		status.setAddedDrinker(null);
+		status.setFinishedDrinker(null);
+		status.setDropedDrinker(null);
+	}
 
 }

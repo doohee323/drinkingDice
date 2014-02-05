@@ -5,7 +5,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.tz.quiz.support.Constants;
-import com.tz.quiz.support.Logger;
 import com.tz.quiz.support.Utils;
 
 /**
@@ -26,7 +25,6 @@ public class Status {
 	private String addedDrinker = null; // added drinker name at last
 	private String finishedDrinker = null; // finished drinker name at last
 	private String dropedDrinker = null; // droped drinker name at last
-	private Logger logger = new Logger(); // print the logging
 
 	/**
 	 * <pre>
@@ -47,35 +45,9 @@ public class Status {
 		return null;
 	}
 
-	/**
-	 * <pre>
-	 * logging end
-	 * </pre>
-	 * 
-	 */
-	public void logEnd() {
-		// if (Constants.debug)
-		// return;
-
-		if (finishedDrinker != null) {
-			logger.println(finishedDrinker + " is done drinking.");
-		}
-		if (dropedDrinker != null) {
-			logger.println(dropedDrinker
-					+ " says: 'I've had too many. I need to stop.'");
-		}
-		logger.println("\n");
-
-		Player curPlayer = getCurPlayer();
-		logger.println("==== STATUS ====");
-		logger.println("The game is over. " + curPlayer.getPlayerName()
-				+ "is the winner.");
-		logger.println("\n");
-		logger.println(curPlayer.getPlayerName() + "is the winner!");
-		logger.flush();
-		addedDrinker = null;
-		finishedDrinker = null;
-		dropedDrinker = null;
+	public void removePlayer(String name) {
+		List<Player> newPlayers = Utils.clonePlayers(players, name);
+		this.players = newPlayers;
 	}
 
 	public int getSn() {
@@ -96,11 +68,6 @@ public class Status {
 
 	public void setPlayers(List<Player> players) {
 		this.players = players;
-	}
-
-	public void removePlayer(String name) {
-		List<Player> newPlayers = Utils.clonePlayers(players, name);
-		this.players = newPlayers;
 	}
 
 	public int getLeftDrintCnt() {
