@@ -198,7 +198,7 @@ public class DrinkingController {
 	public static List<Player> manual(DrinkingService service) {
 
 		// 1) making game
-		Constants.radomPlay = false;
+		Constants.radomPlay = true;
 		Constants.debug = true;
 		service.setMaxDrinkingCnt(2);
 		service.setPausetime(2);
