@@ -9,7 +9,7 @@ import com.tz.quiz.support.Logger;
 
 /**
  * <pre>
- * model class for roll
+ * model class for status of rolling
  * </pre>
  * 
  */
@@ -43,8 +43,8 @@ public class Status {
 		logger.println("It is " + curPlayer.getPlayerName() + "'s turn.");
 		for (int i = 0; i < players.size(); i++) {
 			Player player = players.get(i);
-			if (player.getLeftDrinkingTime() > 0
-					&& player.getLeftDrinkingCnt() > 0) {
+			if (player.isNextDrinking()
+					&& player.getLeftDrinkingTime() != player.getDrinkingTime()) {
 				logger.println(player.getPlayerName() + " has had "
 						+ player.getDrunkCnt()
 						+ " drinks and is currently drinking "
@@ -59,6 +59,7 @@ public class Status {
 		logger.println("\n");
 		logger.println(curPlayer.getPlayerName() + " rolled "
 				+ curPlayer.getDiceDisplayVale());
+		// got assignment
 		if (addedDrinker != null) {
 			logger.println(curPlayer.getPlayerName() + " says: '"
 					+ addedDrinker + ", drink!'");

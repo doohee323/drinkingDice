@@ -81,8 +81,9 @@ public class DrinkingService {
 				for (Future<Status> future : set) {
 					try {
 						status = future.get();
-						if (status.isbWin())
+						if (status.isbWin()) {
 							bWin = true;
+						}
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();

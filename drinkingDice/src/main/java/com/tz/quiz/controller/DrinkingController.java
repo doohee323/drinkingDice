@@ -13,8 +13,6 @@ public class DrinkingController {
 	public static void main(String[] args) {
 
 		DrinkingService service = new DrinkingService();
-		Constants.radomPlay = false;
-		Constants.debug = false;
 
 		// 2) define players
 		// run with screen input
@@ -40,6 +38,8 @@ public class DrinkingController {
 	 */
 	public static List<Player> console(DrinkingService service) {
 		List<Player> players = new ArrayList<Player>();
+		Constants.radomPlay = true;
+		Constants.debug = false;
 
 		Scanner s = new Scanner(System.in);
 		System.out.print("Waiting for players...\n");
@@ -209,9 +209,9 @@ public class DrinkingController {
 
 		Player player2 = new Player(1, "Bob", 3);
 		players.add(player2);
-		//
-		// Player player3 = new Player(2, "Chris", 5);
-		// players.add(player3);
+
+		Player player3 = new Player(2, "Chris", 5);
+		players.add(player3);
 
 		return players;
 	}

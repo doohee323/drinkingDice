@@ -39,7 +39,6 @@ public class Player extends Thread implements Callable<Status> {
 
 		try {
 			synchronized (status) {
-
 				int nSecond = status.getnSecond();
 				Logger.debug(nSecond + " : I'm " + playerName);
 				if (bTurn) {
@@ -99,10 +98,13 @@ public class Player extends Thread implements Callable<Status> {
 	 * </pre>
 	 */
 	public class Drinking {
+		private boolean added = false; // added drinking
+		private boolean finished = false; // finished drinking
 		private int secondToDrink = 0;
 
 		public Drinking() {
 			secondToDrink = drinkingTime;
+			added = true;
 		}
 
 		public int getSecondToDrink() {
@@ -112,8 +114,40 @@ public class Player extends Thread implements Callable<Status> {
 		public int drinking() {
 			if (this.secondToDrink > 0)
 				this.secondToDrink--;
+			added = false;
 			return this.secondToDrink;
 		}
+
+		public boolean isAdded() {
+			return added;
+		}
+
+		public void setAdded(boolean added) {
+			this.added = added;
+		}
+
+		public boolean isFinished() {
+			return finished;
+		}
+
+		public void setFinished(boolean finished) {
+			this.finished = finished;
+		}
+	}
+
+	/**
+	 * <pre>
+	 * check next drinking to drink
+	 * </pre>
+	 * 
+	 * @return boolean whether is thing to drink
+	 */
+	public boolean isNextDrinking() {
+		if(curDrunkSeq < 0) return false;
+		if (!drinkings.get(curDrunkSeq).isAdded() && !drinkings.get(curDrunkSeq).isFinished()) {
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -126,8 +160,15 @@ public class Player extends Thread implements Callable<Status> {
 	 */
 	public boolean drinking() {
 		// when nothing to drink, return false
-		if (getLeftDrinkingTime() == 0)
+		if (getLeftDrinkingTime() == 0) {
 			return false;
+		}
+
+		// skill at first second
+		if (this.drinkings.get(curDrunkSeq).isAdded()) {
+			this.drinkings.get(curDrunkSeq).setAdded(false);
+			return false;
+		}
 
 		// get the left time to drink this drinking
 		int dringLeftTime = this.drinkings.get(curDrunkSeq).drinking();
@@ -139,6 +180,7 @@ public class Player extends Thread implements Callable<Status> {
 		if (dringLeftTime == 0) {
 			Logger.debug(status.getnSecond() + " / finished drinking:"
 					+ playerName + " (" + curDrunkSeq + ")");
+			this.drinkings.get(curDrunkSeq).setFinished(true);
 			if ((this.drinkings.size() - 1) > curDrunkSeq) {
 				curDrunkSeq++;
 			}
@@ -156,7 +198,8 @@ public class Player extends Thread implements Callable<Status> {
 		Iterator<Player> e = status.getPlayers().iterator();
 		while (e.hasNext()) {
 			Player player = e.next();
-			if (player.getSn() != self && drinkings.size() < maxDrintCnt) {
+			if (player.getSn() != self
+					&& player.getDrinkings().size() < maxDrintCnt) {
 				players.add(player);
 			}
 		}
@@ -182,12 +225,14 @@ public class Player extends Thread implements Callable<Status> {
 		if (this.drinkings.size() < status.getMaxDrinkingCnt()) {
 			// when finished this drinking, move to the next drinking
 			if ((this.drinkings.size() - 1) == curDrunkSeq
-					&& getLeftDrinkingTime() == 0)
+					&& getLeftDrinkingTime() == 0) {
 				curDrunkSeq++;
+			}
 
 			this.drinkings.add(new Drinking());
 			Logger.debug(status.getnSecond() + " / add drinking:" + playerName
 					+ " (" + (this.drinkings.size() - 1) + ")");
+
 			return true;
 		}
 		return false;
@@ -242,7 +287,7 @@ public class Player extends Thread implements Callable<Status> {
 	 * @return left time to drink
 	 */
 	public int getLeftDrinkingCnt() {
-		return drunkCnt - curDrunkSeq;
+		return drinkings.size() - curDrunkSeq;
 	}
 
 	public String getDiceVale() {
