@@ -39,7 +39,7 @@ public class DrinkingService {
 
 		try {
 			// play with random roll or not
-			if (Constants.radomPlay) {
+			if (Constants.randomPlay) {
 				Collections.shuffle(players);
 			}
 			status.setPlayers(players);
@@ -76,20 +76,20 @@ public class DrinkingService {
 					set.add(future);
 				}
 
-				boolean bWin = false;
-				for (Future<Status> future : set) {
-					try {
-						status = future.get();
-						if (status.isbWin()) {
-							bWin = true;
-						}
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					} catch (ExecutionException e) {
-						e.printStackTrace();
-					}
-				}
-				status.setbWin(bWin);
+//				boolean bWin = false;
+//				for (Future<Status> future : set) {
+//					try {
+//						status = future.get();
+//						if (status.isbWin()) {
+//							bWin = true;
+//						}
+//					} catch (InterruptedException e) {
+//						e.printStackTrace();
+//					} catch (ExecutionException e) {
+//						e.printStackTrace();
+//					}
+//				}
+//				status.setbWin(bWin);
 
 				pool.shutdown();
 

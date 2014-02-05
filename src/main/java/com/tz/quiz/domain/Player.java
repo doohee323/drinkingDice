@@ -240,7 +240,7 @@ public class Player extends Thread implements Callable<Status> {
 
 		// choose driker at ramdon
 		// play with random roll or not
-		if (Constants.radomPlay) {
+		if (Constants.randomPlay) {
 			Collections.shuffle(players);
 		}
 		if (players.size() == 0)

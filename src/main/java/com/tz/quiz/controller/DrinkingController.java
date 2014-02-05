@@ -20,7 +20,7 @@ public class DrinkingController {
 		List<Player> players = console(service);
 
 		// run with predefined input
-		// List<Player> players = manual(service);
+		//		 List<Player> players = manual(service);
 
 		// 2) run the game
 		service.playDrinkingGame(players);
@@ -39,7 +39,7 @@ public class DrinkingController {
 	 */
 	public static List<Player> console(DrinkingService service) {
 		List<Player> players = new ArrayList<Player>();
-		Constants.radomPlay = true;
+		Constants.randomPlay = true;
 		Constants.debug = false;
 
 		Scanner s = new Scanner(System.in);
@@ -170,9 +170,9 @@ public class DrinkingController {
 					continue;
 				}
 				if (strArry[1].equals("Y")) {
-					Constants.radomPlay = true;
+					Constants.randomPlay = true;
 				} else if (strArry[1].equals("N")) {
-					Constants.radomPlay = false;
+					Constants.randomPlay = false;
 				} else {
 					System.out
 							.print("Incorrect number of arguements for 'RANDOM'\n");
@@ -198,7 +198,7 @@ public class DrinkingController {
 	public static List<Player> manual(DrinkingService service) {
 
 		// 1) making game
-		Constants.radomPlay = true;
+		Constants.randomPlay = false;
 		Constants.debug = true;
 		service.setMaxDrinkingCnt(2);
 		service.setPausetime(2);

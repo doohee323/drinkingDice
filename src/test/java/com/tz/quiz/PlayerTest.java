@@ -36,7 +36,7 @@ public class PlayerTest extends TestSupport {
 		// 1) making game
 		List<Player> players = new ArrayList<Player>();
 
-		Constants.radomPlay = false;
+		Constants.randomPlay = false;
 		Constants.debug = false;
 
 		given("with @ players,", "3");

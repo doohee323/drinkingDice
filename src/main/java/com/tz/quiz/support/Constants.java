@@ -25,7 +25,7 @@ public class Constants {
 	// default maximum count which player can drink in this rolling
 	final public static int defaultMaxDrinkingCnt = 2;
 	// for development, whether using random player or not
-	public static boolean radomPlay = true;
+	public static boolean randomPlay = true;
 	// debugger flag
 	public static boolean debug = true;
 
