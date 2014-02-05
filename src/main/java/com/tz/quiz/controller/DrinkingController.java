@@ -1,6 +1,7 @@
 package com.tz.quiz.controller;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Pattern;
@@ -10,17 +11,17 @@ import com.tz.quiz.service.DrinkingService;
 import com.tz.quiz.support.Constants;
 
 public class DrinkingController {
-	
+
 	public static void main(String[] args) {
 
 		DrinkingService service = new DrinkingService();
 
 		// 1) define players
 		// run with screen input
-//		List<Player> players = console(service);
+		 List<Player> players = console(service);
 
 		// run with predefined input
-				 List<Player> players = manual(service);
+//		List<Player> players = manual(service);
 
 		// 2) run the game
 		service.playDrinkingGame(players);
@@ -86,6 +87,16 @@ public class DrinkingController {
 							.print("Incorrect number of arguements for 'ADD'\n");
 					continue;
 				}
+				Iterator<Player> e = players.iterator();
+				while (e.hasNext()) {
+					Player player = e.next();
+					if (player.getPlayerName().equals(strArry[1])) {
+						System.out
+								.print("The player exists aleady.\n");
+						continue;
+					}
+				}
+
 				Player player = new Player(nPlayerInx, strArry[1], drinkingTime);
 				players.add(player);
 				System.out.print(strArry[0] + ", who can finish a drink in "
@@ -213,6 +224,9 @@ public class DrinkingController {
 
 		Player player3 = new Player(2, "Chris", 5);
 		players.add(player3);
+
+		Player player4 = new Player(3, "Tom", 7);
+		players.add(player4);
 
 		return players;
 	}
