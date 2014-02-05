@@ -17,6 +17,7 @@ public class Status {
 
 	private int nTurn = 0; // current turn's player's index
 	private int nSecond = 0; // time (seconds)
+	private int pausetime = Constants.defaultRollSpeed; // rolling time
 	private int maxDrinkingCnt = Constants.defaultMaxDrinkingCnt; // maximum
 	private int leftDrintCnt = 0; // number of drinking player at this moment
 	private List<Player> players = new ArrayList<Player>();
@@ -198,6 +199,14 @@ public class Status {
 
 	public void setbWin(boolean bWin) {
 		this.bWin = bWin;
+	}
+
+	public int getPausetime() {
+		return pausetime;
+	}
+
+	public void setPausetime(int pausetime) {
+		this.pausetime = pausetime;
 	}
 
 }

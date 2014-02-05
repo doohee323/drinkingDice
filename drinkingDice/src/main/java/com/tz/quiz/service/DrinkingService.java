@@ -46,6 +46,8 @@ public class DrinkingService {
 				Collections.shuffle(players);
 			}
 			status.setPlayers(players);
+			status.setMaxDrinkingCnt(maxDrinkingCnt);
+			status.setPausetime(pausetime);
 
 			int nSecond = 0; // time by second
 			while (true) {

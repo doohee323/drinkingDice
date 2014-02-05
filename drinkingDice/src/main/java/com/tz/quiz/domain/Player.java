@@ -36,23 +36,25 @@ public class Player extends Thread implements Callable<Status> {
 
 	@Override
 	public Status call() throws Exception {
-
 		try {
 			synchronized (status) {
+				int pauseTime = status.getPausetime();
 				int nSecond = status.getnSecond();
 				Logger.debug(nSecond + " : I'm " + playerName);
 				if (bTurn) {
-					dice();
-					boolean bWin = Constants.isWin(diceVale);
-					if (bWin) {
-						status.setbWin(true);
-						// choose driker at ramdon
-						int indx = getDrinkers(status, sn);
-						if (indx >= 0) {
-							status.getPlayerBySn(indx).addDrinking();
-							status.addLeftDrintCnt();
-							status.setAddedDrinker(status.getPlayerBySn(indx)
-									.getPlayerName());
+					if (nSecond == 0 || (nSecond % pauseTime) == 0) {
+						dice();
+						boolean bWin = Constants.isWin(diceVale);
+						if (bWin) {
+							status.setbWin(true);
+							// choose driker at ramdon
+							int indx = getDrinkers(status, sn);
+							if (indx >= 0) {
+								status.getPlayerBySn(indx).addDrinking();
+								status.addLeftDrintCnt();
+								status.setAddedDrinker(status.getPlayerBySn(
+										indx).getPlayerName());
+							}
 						}
 					}
 				} else {
@@ -143,8 +145,10 @@ public class Player extends Thread implements Callable<Status> {
 	 * @return boolean whether is thing to drink
 	 */
 	public boolean isNextDrinking() {
-		if(curDrunkSeq < 0) return false;
-		if (!drinkings.get(curDrunkSeq).isAdded() && !drinkings.get(curDrunkSeq).isFinished()) {
+		if (curDrunkSeq < 0)
+			return false;
+		if (!drinkings.get(curDrunkSeq).isAdded()
+				&& !drinkings.get(curDrunkSeq).isFinished()) {
 			return true;
 		}
 		return false;
